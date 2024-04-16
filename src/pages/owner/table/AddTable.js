@@ -76,26 +76,47 @@ const AddTable = () => {
                     onChange={(e) => setNumberOfSeats(e.target.value)}
                   />
                 </div>
-                <div className="form-group  col-md-3">
+
+                <div className="form-group col-md-3">
                   <label className="control-label">Setup</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    required
-                    value={setup}
-                    onChange={(e) => setSetup(e.target.value)}
-                  />
+                  <div className="input-group">
+                    <select
+                      className="custom-select form-control"
+                      value={setup}
+                      onChange={(e) => setSetup(e.target.value)}
+                    >
+                      <option value="">Chọn</option>
+                      <option value="Có sẵn">Có sẵn</option>
+                      <option value="Không có sẵn">Không có sẵn</option>
+                    </select>
+                    <div className="input-group-append">
+                      <span className="input-group-text">
+                        <i className="fas fa-caret-down"></i>
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group  col-md-3">
+
+                <div className="form-group col-md-3">
                   <label className="control-label">Trạng thái</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    required
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  />
+                  <div className="input-group">
+                    <select
+                      className="custom-select form-control"
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                    >
+                      <option value="">Chọn</option>
+                      <option value="Đang trống">Đang trống</option>
+                      <option value="Đã đặt">Đã đặt</option>
+                    </select>
+                    <div className="input-group-append">
+                      <span className="input-group-text">
+                        <i className="fas fa-caret-down"></i>
+                      </span>
+                    </div>
+                  </div>
                 </div>
+
                 <button className="btn btn-info" type="submit">
                   Lưu lại
                 </button>

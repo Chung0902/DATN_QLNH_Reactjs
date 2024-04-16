@@ -220,16 +220,8 @@ const OrderManagement = () => {
                                 )}
                                 {e.orderDetails.indexOf(orderDetail) === 0 && (
                                   <td>
-                                    <NavLink
-                                      to="/main/ordermanagement/orderdetails"
-                                    >
-                                    <button className="btn btn-cancel">
-                                      <i className="fas fa-edit icon"></i>
-                                    </button>
-                                    </NavLink>
-        
-                                    <button
-                                      className="btn btn-cancel "
+                                    {/* <button
+                                      className="btn btn-primary btn-sm trash"
                                       type="button"
                                       title="Xóa"
                                       onClick={() =>
@@ -245,8 +237,30 @@ const OrderManagement = () => {
                                         e.order.status === "CANCELED"
                                       }
                                     >
-                                      <i className="fa fa-trash-alt red-color"></i>
+                                      <i className="fas fa-trash-alt"></i>
+                                    </button> */}
+
+                                    <button
+                                      className="btn btn-primary btn-sm trash"
+                                      type="button"
+                                      title="Xóa"
+                                      // onClick={() => { handleDelete(p._id)}}
+                                    >
+                                      <i className="fas fa-trash-alt"></i>
                                     </button>
+
+                                    <NavLink
+                                      to="/main/ordermanagement/orderdetails"
+                                    >
+                                    <button 
+                                    className="btn btn-primary btn-sm edit"
+                                    title="Xem chi tiết"
+                                    >
+                                      <i className="fas fa-edit icon"></i>
+                                    </button>
+                                    </NavLink>
+        
+                                    
                                   </td>
                                 )}
                               </tr>

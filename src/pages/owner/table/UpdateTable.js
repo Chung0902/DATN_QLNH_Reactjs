@@ -52,7 +52,7 @@ const UpdateTable = ({
             </div>
             <div className="row">
               <div className="form-group col-md-6">
-                <label className="control-label">Tên ăn</label>
+                <label className="control-label">Tên bàn</label>
                 <input
                   className="form-control"
                   type="text"
@@ -71,22 +71,28 @@ const UpdateTable = ({
               </div>
               <div className="form-group col-md-6">
                 <label className="control-label">Setup</label>
-                <input
+                <select
                   className="form-control"
-                  type="text"
                   value={setup}
                   onChange={(e) => setSetup(e.target.value)}
-                />
+                >
+                  <option value="Có săn">Có sẵn</option>
+                  <option value="Không có sẵn">Không có sẵn</option>
+                </select>
               </div>
+
               <div className="form-group col-md-6">
                 <label className="control-label">Trạng thái</label>
-                <input
+                <select
                   className="form-control"
-                  type="text"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                />
+                >
+                  <option value="Đang trống">Đang trống</option>
+                  <option value="Đã đặt">Đã đặt</option>
+                </select>
               </div>
+
             </div>
 
             <button className="btn btn-save" type="submit">
