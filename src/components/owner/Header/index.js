@@ -36,7 +36,7 @@ const Header = () => {
           </li>
           <li>
             <NavLink to="/main/tablesmanager" className="active1">
-              <span className="fa-solid fa-file-circle-plus" />
+              <span className="fas fa-table" />
               <span>Tables</span>
             </NavLink>
           </li>
