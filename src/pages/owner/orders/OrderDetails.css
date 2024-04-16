@@ -36,41 +36,41 @@
     margin-left: 117px;
   }
   
-  label {
+  .invoice-container label {
     margin-bottom: 5px;
   }
   
-  input[type="text"],
-  input[type="number"],
-  select {
+  .invoice-container input[type="text"],
+  .invoice-container input[type="number"],
+  .invoice-container select {
     padding: 5px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
   }
   
-  table {
+  .invoice-container table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
   }
   
-  table,
-  th,
-  td {
+  .invoice-container table,
+  .invoice-container th,
+  .invoice-container td {
     border: 1px solid #ccc;
   }
   
-  th,
-  td {
+  .invoice-container th,
+  .invoice-container td {
     padding: 10px;
     text-align: left;
   }
   
-  th {
+  .invoice-container th {
     background-color: #f2f2f2;
   }
   
-  button {
+  .invoice-container button {
     padding: 5px 10px;
     cursor: pointer;
     background-color: #f44336;
@@ -104,4 +104,6 @@
   .invoice-totals div {
     margin-bottom: 10px;
   }
+
+  
   

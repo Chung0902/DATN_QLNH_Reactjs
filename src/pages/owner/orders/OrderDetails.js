@@ -94,6 +94,7 @@ const OrderDetails = () => {
                       </tbody>
                     </table>
                   </div>
+
                   <div className="invoice-totals">
                     <div>
                       <label>Tạm tính</label>
@@ -120,6 +121,16 @@ const OrderDetails = () => {
                     </div>
                   </div>
                 </div>
+                <button className="btn btn-save" type="submit">
+              Lưu lại
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Hủy bỏ
+            </button>
               </div>
             </div>
           </div>

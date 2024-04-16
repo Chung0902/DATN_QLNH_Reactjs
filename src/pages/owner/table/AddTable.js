@@ -3,6 +3,7 @@ import axiosClient from "../../../libraries/axiosClient";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
+
 const AddTable = () => {
   const [tables, setTables] = useState([]);
   const [name, setName] = useState("");
