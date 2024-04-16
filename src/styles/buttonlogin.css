@@ -1,0 +1,53 @@
+.buttonlg {
+    border: none;
+    color: #fff;
+    background-image: linear-gradient(30deg, #0400ff, #4ce3f7);
+    border-radius: 20px;
+    background-size: 100% auto;
+    font-family: inherit;
+    font-size: 17px;
+    padding: 0.6em 1.5em;
+   }
+   
+   .buttonlg:hover {
+    background-position: right center;
+    background-size: 200% auto;
+    -webkit-animation: pulse 2s infinite;
+    animation: pulse512 1.5s infinite;
+   }
+   
+   @keyframes pulse512 {
+    0% {
+     box-shadow: 0 0 0 0 #05bada66;
+    }
+   
+    70% {
+     box-shadow: 0 0 0 10px rgb(218 103 68 / 0%);
+    }
+   
+    100% {
+     box-shadow: 0 0 0 0 rgb(218 103 68 / 0%);
+    }
+   }
+.bg-login{
+    background-image: url(https://png.pngtree.com/thumb_back/fw800/background/20190826/pngtree-water-dynamic-white-blue-background-image_299695.jpg) !important;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+}
+.bg-forgot{
+    background-image: url(https://img5.thuthuatphanmem.vn/uploads/2021/11/22/hinh-nen-mau-xanh-ngoc-cho-laptop_100603365.jpg) !important;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+}
+.card1{
+    
+    background-color: rgba(3, 34, 106, 0.664);
+
+}
+.card2{
+    
+    background-color: rgba(182, 255, 242, 0.63);
+
+}
