@@ -10,6 +10,7 @@ const OrderDetails = () => {
   const { id } = useParams(); // Lấy id từ đường dẫn
   const [status, setStatus] = useState("");
 
+
   useEffect(() => {
     const getOrderDetails = async () => {
       try {
@@ -78,11 +79,11 @@ const OrderDetails = () => {
                           className="form-control"
                           type="text"
                           required
-                          value={e.order.lastName}
+                          value={`${e.order.customer.firstName}${e.order.customer.lastName}`}
                         />
                       </div>
                       <div>
-                        <span>{formatDate(e.order.createdDate)}</span>
+                        <span>Ngày đặt: {formatDate(e.order.createdDate)}</span>
                         <button type="button" title="Thêm món ăn">
                           <FaPlusSquare />
                         </button>
@@ -95,6 +96,7 @@ const OrderDetails = () => {
                             <th>Món ăn</th>
                             <th>Số lượng</th>
                             <th>Giá</th>
+                            <th>Giảm giá</th>
                             <th>Tổng tiền</th>
                             <th>Action</th>
                           </tr>
@@ -131,6 +133,14 @@ const OrderDetails = () => {
                                   className="form-control"
                                   type="text"
                                   required
+                                  value={orderDetail.productDiscount}
+                                />
+                              </td>
+                              <td>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  required
                                   value={orderDetail.totalOrderDetailPrice}
                                 />
                               </td>
@@ -152,7 +162,7 @@ const OrderDetails = () => {
                           // className="form-control"
                           type="text"
                           required
-                          value={e.totalamountdiscount}
+                          value={e.totalOrder}
                         />
                       </div>
                       <div>
@@ -164,13 +174,14 @@ const OrderDetails = () => {
                           value={e.order.discount}
                         />
                       </div>
+                      
                       <div>
                         <label>Thành tiền</label>
                         <input
                           // className="form-control"
                           type="text"
                           required
-                          value={e.totalOrderPrice}
+                          value={e.totalamountdiscount}
                         />
                       </div>
                       <div>

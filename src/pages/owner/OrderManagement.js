@@ -219,13 +219,14 @@ const OrderManagement = () => {
                                     </button>
 
                                     <NavLink to={`/main/ordermanagement/orderdetails/${e.order._id}`} >
-                                    <button
-                                      className="btn btn-primary btn-sm edit"
-                                      title="Xem chi tiết"
-                                    >
-                                      <i className="fas fa-edit icon"></i>
-                                    </button>
-                                  </NavLink>
+                                      <button
+                                        className="btn btn-primary btn-sm edit"
+                                        title="Xem chi tiết"
+                                      >
+                                        <i className="fas fa-edit icon"></i>
+                                      </button>
+                                    </NavLink>
+
                                     
                                   </td>
                                 )}
