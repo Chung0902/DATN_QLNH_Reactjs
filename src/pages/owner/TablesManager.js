@@ -23,7 +23,7 @@ const TablesManager = () => {
       const response = await axiosClient.get(`questions/productSearchb?name=${searchTerm}`);
       console.log(response.payload);
       if (response?.payload)
-      setTables(response?.payload); // Cập nhật state products với kết quả tìm kiếm
+      setTables(response?.payload); 
     
     } catch (error) {
       console.log(error);
@@ -31,11 +31,11 @@ const TablesManager = () => {
   };
 
   //xử lý chọn vào checkbox lấy id
-  const handleItemCheck = (event, productId) => {
+  const handleItemCheck = (event, tableId) => {
     const isChecked = event.target.checked;
     setCheckedItems({
       ...checkedItems,
-      [productId]: isChecked,
+      [tableId]: isChecked,
     });
   };
 
@@ -44,8 +44,8 @@ const TablesManager = () => {
     const isChecked = event.target.checked;
     const newCheckedItems = {};
   
-    tables.forEach((product) => {
-      newCheckedItems[product._id] = isChecked;
+    tables.forEach((table) => {
+      newCheckedItems[table._id] = isChecked;
     });
   
     setCheckedItems(newCheckedItems);
@@ -59,7 +59,7 @@ const TablesManager = () => {
     try {
       await axiosClient.post('admin/tables/delete', { selectedIds });
       setCheckedItems({});
-      setTables(tables.filter((product) => !selectedIds.includes(product._id)));
+      setTables(tables.filter((table) => !selectedIds.includes(table._id)));
       toast.success("Đã xóa bàn");
     } catch (error) {
       console.error(error);
@@ -76,7 +76,7 @@ const TablesManager = () => {
           name: uname,
           numberOfSeats: unumberOfSeats,
           setup: usetup,
-          status: ustatus,
+          status: ustatus
         }
       );
       if (response.success) {
@@ -114,7 +114,7 @@ const TablesManager = () => {
         const response = await axiosClient.delete(`admin/tables/${pId}`);
         if(response?.success){
             toast.success(`tables is deleted`);
-            setTables(tables.filter((product) => product._id !== pId)); 
+            setTables(tables.filter((table) => table._id !== pId)); 
             
         }
         

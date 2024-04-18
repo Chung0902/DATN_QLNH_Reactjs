@@ -1,27 +1,36 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../../../libraries/axiosClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./OrderDetails.css";
+import { FaPlusSquare } from "react-icons/fa";
 
 const OrderDetails = () => {
-  const [listorders, setListorders] = useState([]);
-  const [status, setStatus] = useState("");
   const navigate = useNavigate();
-
-  const getlistorders = async () => {
-    try {
-      const response = await axiosClient.get(
-        `questions/listorders?status=${status}`
-      );
-      setListorders(response.payload);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const [orderDetails, setOrderDetails] = useState([]);
+  const { id } = useParams(); // Lấy id từ đường dẫn
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
-    getlistorders();
-  }, [status]);
+    const getOrderDetails = async () => {
+      try {
+        const response = await axiosClient.get(`questions/listorders1?status=${status}&id=${id}`);
+        setOrderDetails(response.payload); // Cập nhật thông tin đơn hàng vào state
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getOrderDetails(); // Gọi hàm để lấy thông tin đơn hàng khi component mount
+  }, [id][status]);
+
+  // Hàm biến đổi định dạng ngày
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear().toString().slice(0);
+    return `${day}/${month}/${year}`;
+  };
 
   return (
     <main className="app-content">
@@ -45,92 +54,150 @@ const OrderDetails = () => {
             <div className="tile-body">
               <div className="tile-body">
                 <div className="col-sm-2"></div>
-                <div className="invoice-container">
-                  <div className="invoice-header">
-                    <div>
-                      <label>Bàn</label>
-                      <select>
-                        <option value="table1">Bàn 1</option>
-                        <option value="table2">Bàn 2</option>
-                        <option value="table3">Bàn 3</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label>Khách hàng</label>
-                      <select>
-                        <option value="customer1">Apricot Hotel</option>
-                      </select>
-                    </div>
-                    <div>
-                      <span>Ngày tạo: 2020-03-04</span>
-                      <span>Giờ tạo: 11:16 pm</span>
-                    </div>
-                  </div>
-                  <div className="invoice-body">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Sản phẩm</th>
-                          <th>Số lượng</th>
-                          <th>Giá</th>
-                          <th>Tổng tiền</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Xôi dừa hạt sen</td>
-                          <td>
-                            <input type="number" value="2" />
-                          </td>
-                          <td>
-                            <input type="text" value="250000" />
-                          </td>
-                          <td>500000.00</td>
-                          <td>
-                            <button>X</button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
 
-                  <div className="invoice-totals">
-                    <div>
-                      <label>Tạm tính</label>
-                      <input type="text" value="1580000.00" readOnly />
+                {orderDetails && orderDetails
+                  .filter(
+                    (e) => status === "" || e.order.status === status
+                  )
+                  .map((e) => (
+                  <div key={e.order._id} className="invoice-container">
+                    <div className="invoice-header ">
+                      <div>
+                        <label>Bàn</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          required
+                          value={e.order.table}
+                        />
+                      </div>
+
+                      <div>
+                        <label>Khách hàng</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          required
+                          value={e.order.lastName}
+                        />
+                      </div>
+                      <div>
+                        <span>{formatDate(e.order.createdDate)}</span>
+                        <button type="button" title="Thêm món ăn">
+                          <FaPlusSquare />
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <label>VAT 13%</label>
-                      <input type="text" value="205400.00" readOnly />
+                    <div className="invoice-body">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Món ăn</th>
+                            <th>Số lượng</th>
+                            <th>Giá</th>
+                            <th>Tổng tiền</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {e.orderDetails.map((orderDetail) => (
+                            <tr key={orderDetail.productId}>
+                              <td>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  required
+                                  value={orderDetail.productName}
+                                />
+                              </td>
+                              <td>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  required
+                                  value={orderDetail.quantity}
+                                />
+                              </td>
+                              <td>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  required
+                                  value={orderDetail.productPrice}
+                                />
+                              </td>
+                              <td>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  required
+                                  value={orderDetail.totalOrderDetailPrice}
+                                />
+                              </td>
+                              <td>
+                                <button type="button" title="Xóa món ăn">
+                                  X
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                    <div>
-                      <label>Giảm giá</label>
-                      <input type="text" value="20" />
-                    </div>
-                    <div>
-                      <label>Thực trả</label>
-                      <input type="text" value="1785380.00" readOnly />
-                    </div>
-                    <div>
-                      <label>Trạng thái</label>
-                      <select>
-                        <option value="paid">Đã thanh toán</option>
-                        <option value="unpaid">Chưa thanh toán</option>
-                      </select>
+
+                    <div className="invoice-totals">
+                      <div>
+                        <label>Tạm tính</label>
+                        <input
+                          // className="form-control"
+                          type="text"
+                          required
+                          value={e.totalamountdiscount}
+                        />
+                      </div>
+                      <div>
+                        <label>Chiết khấu</label>
+                        <input
+                          // className="form-control"
+                          type="text"
+                          required
+                          value={e.order.discount}
+                        />
+                      </div>
+                      <div>
+                        <label>Thành tiền</label>
+                        <input
+                          // className="form-control"
+                          type="text"
+                          required
+                          value={e.totalOrderPrice}
+                        />
+                      </div>
+                      <div>
+                        <label>Trạng thái</label>
+                        <select
+                          // className="form-control"
+                          value={e.order.status}
+                        >
+                          <option value="COMPLETED">COMPLETED</option>
+                          <option value="WAITING">WAITING</option>
+                          <option value="CANCELED">CANCELED</option>
+                          <option value="DELIVERING">DELIVERING</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
                 <button className="btn btn-save" type="submit">
-              Lưu lại
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Hủy bỏ
-            </button>
+                  Lưu lại
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => navigate("/main/ordermanagement")}
+                >
+                  Trở về
+                </button>
               </div>
             </div>
           </div>

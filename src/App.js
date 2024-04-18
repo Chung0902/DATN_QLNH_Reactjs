@@ -39,7 +39,7 @@ function App() {
           <Route path="/main/productsmanager" element={<ProductsManager/>} />
           <Route path="/main/productsmanager/addproducts" element={<AddProduct/>} />
           <Route path="/main/ordermanagement" element={<OrderManagement/>} />
-          <Route path="/main/ordermanagement/orderdetails" element={<OrderDetails/>} />
+          <Route path="/main/ordermanagement/orderdetails/:id" element={<OrderDetails/>} />
           <Route path="/main/revenuemanagement" element={<RevenueManagement/>} />
           <Route path="/main/chat" element={<ChatOnline/>} />
 

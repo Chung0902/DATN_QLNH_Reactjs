@@ -3,112 +3,101 @@ import { toast } from "react-hot-toast";
 import axiosClient from "../../libraries/axiosClient";
 import { useAuth } from "../../context/auth";
 import { NavLink } from "react-router-dom";
+import OrderDetails from "./orders/OrderDetails";
 
 const OrderManagement = () => {
   const [listorders, setListorders] = useState([]);
-  const [checkedItems, setCheckedItems] = useState({});
-  const [auth, setAuth] = useAuth();
+  const [utable, setUTable] = useState();
+  const [ufirstName, setUFirstName] = useState();
+  const [ulastName, setULastName] = useState();
+  const [ucreatedDate, setUCreatedDate] = useState();
+  const [uproductName, setUProductName] = useState();
+  const [uquantity, setUPuantity] = useState();
+  const [uproductPrice, setUProductPrice] = useState();
+  const [utotalOrderDetailPrice, setUTotalOrderDetailPrice] = useState();
+  const [utotalamountdiscount, setUTotalamountdiscount] = useState();
+  const [udiscount, setUDiscount] = useState();
+  const [utotalOrderPrice, setUTotalOrderPrice] = useState();
+  const [ustatus, setUStatus] = useState();
   const [status, setStatus] = useState("");
 
-  const handleItemCheck = (event, orderID) => {
-    const isChecked = event.target.checked;
-    setCheckedItems({
-      ...checkedItems,
-      [orderID]: isChecked,
-    });
-  };
+  const [selected, setSelected] = useState(null);
 
-  const handleSelectAll = (event) => {
-    const isChecked = event.target.checked;
-    const newCheckedItems = {};
-
-    listorders.forEach((order) => {
-      newCheckedItems[order._id] = isChecked;
-    });
-
-    setCheckedItems(newCheckedItems);
-  };
-
-  const handleDeleteSelected = async () => {
-    const selectedIds = Object.keys(checkedItems).filter(
-      (itemId) => checkedItems[itemId]
-    );
-
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     try {
-      await axiosClient.post("admin/orders/delete", { selectedIds });
-      setCheckedItems({});
-      setListorders(
-        listorders.filter((order) => !selectedIds.includes(order.order._id))
+      const response = await axiosClient.patch(
+        `questions/listorders1/${selected._id}`,
+        {
+          table: utable,
+          firstName: ufirstName,
+          lastName: ulastName,
+          createdDate: ucreatedDate,
+          productName: uproductName,
+          quantity: uquantity,
+          productPrice: uproductPrice,
+          totalOrderDetailPrice: utotalOrderDetailPrice,
+          totalamountdiscount: utotalamountdiscount,
+          discount: udiscount,
+          totalOrderPrice: utotalOrderPrice,
+          status: ustatus,
+        }
       );
-      toast.success("Đã xóa món ăn");
+      if (response.success) {
+        toast.success(" is updated");
+        setSelected(null);
+        setUTable("");
+        setUFirstName("");
+        setUDiscount("");
+        setULastName("");
+        setUCreatedDate("");
+        setUProductName("");
+        setUPuantity("");
+        setUProductPrice("");
+        setUTotalOrderDetailPrice("");
+        setUTotalamountdiscount("");
+        setUTotalOrderPrice("");
+        setUStatus("");
+        setListorders(
+          listorders.map((product) => {
+            if (product._id === selected._id) {
+              return {
+                ...product,
+                table: utable,
+                firstName: ufirstName,
+                lastName: ulastName,
+                createdDate: ucreatedDate,
+                productName: uproductName,
+                quantity: uquantity,
+                productPrice: uproductPrice,
+                totalOrderDetailPrice: utotalOrderDetailPrice,
+                totalamountdiscount: utotalamountdiscount,
+                discount: udiscount,
+                totalOrderPrice: utotalOrderPrice,
+                status: ustatus,
+              };
+            }
+            return product;
+          })
+        );
+        getlistorders();
+      }
     } catch (error) {
-      console.error(error);
-      toast.error("Có lỗi xảy ra khi xóa món ăn");
+      console.log(error.message);
+      toast.error("Something went wrong");
     }
   };
 
-  const updateCancel = async (orderId, employeeId, paymentType, customerId) => {
+  const handleDelete = async (pId) =>{
     try {
-      const response = await axiosClient.patch(`admin/orders/${orderId}`, {
-        status: "CANCELED",
-        employeeId,
-        paymentType,
-        customerId,
-      });
-      setListorders((prevList) =>
-        prevList.map((order) => {
-          if (order.order._id === orderId) {
-            return {
-              ...order,
-              order: {
-                ...order.order,
-                status: "CANCELED",
-                employeeId,
-                paymentType,
-                customerId,
-              },
-            };
-          }
-          return order;
-        })
-      );
+        const response = await axiosClient.delete(`questions/listorders1/${pId}`);
+        if(response?.success){
+            toast.success(`orders is deleted`);
+            setListorders(listorders.filter((listorder) => listorder._id !== pId)); 
+        }
+        
     } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const updateComplete = async (
-    orderId,
-    employeeId,
-    paymentType,
-    customerId
-  ) => {
-    try {
-      const response = await axiosClient.patch(`admin/orders/${orderId}`, {
-        status: "COMPLETED",
-        employeeId,
-        paymentType,
-        customerId,
-      });
-      setListorders((prevList) =>
-        prevList.map((order) => {
-          if (order.order._id === orderId) {
-            return {
-              ...order,
-              order: {
-                ...order.order,
-                status: "COMPLETED",
-                employeeId,
-                paymentType,
-                customerId,
-              },
-            };
-          }
-          return order;
-        })
-      );
-    } catch (error) {
-      console.error(error);
+        toast.error('Something went wrong')
     }
   };
 
@@ -220,46 +209,23 @@ const OrderManagement = () => {
                                 )}
                                 {e.orderDetails.indexOf(orderDetail) === 0 && (
                                   <td>
-                                    {/* <button
-                                      className="btn btn-primary btn-sm trash"
-                                      type="button"
-                                      title="Xóa"
-                                      onClick={() =>
-                                        updateCancel(
-                                          e.order._id,
-                                          auth.user._id,
-                                          e.order.paymentType,
-                                          e.order.customer._id
-                                        )
-                                      }
-                                      disabled={
-                                        e.order.status === "COMPLETED" ||
-                                        e.order.status === "CANCELED"
-                                      }
-                                    >
-                                      <i className="fas fa-trash-alt"></i>
-                                    </button> */}
-
                                     <button
                                       className="btn btn-primary btn-sm trash"
                                       type="button"
                                       title="Xóa"
-                                      // onClick={() => { handleDelete(p._id)}}
+                                      onClick={() => { handleDelete(e.order._id)}}
                                     >
                                       <i className="fas fa-trash-alt"></i>
                                     </button>
 
-                                    <NavLink
-                                      to="/main/ordermanagement/orderdetails"
-                                    >
-                                    <button 
-                                    className="btn btn-primary btn-sm edit"
-                                    title="Xem chi tiết"
+                                    <NavLink to={`/main/ordermanagement/orderdetails/${e.order._id}`} >
+                                    <button
+                                      className="btn btn-primary btn-sm edit"
+                                      title="Xem chi tiết"
                                     >
                                       <i className="fas fa-edit icon"></i>
                                     </button>
-                                    </NavLink>
-        
+                                  </NavLink>
                                     
                                   </td>
                                 )}

@@ -3,13 +3,12 @@ import axiosClient from "../../../libraries/axiosClient";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-
 const AddTable = () => {
   const [tables, setTables] = useState([]);
-  const [name, setName] = useState("");
-  const [numberOfSeats, setNumberOfSeats] = useState("");
-  const [setup, setSetup] = useState("");
-  const [status, setStatus] = useState("");
+  const [name, setName] = useState();
+  const [numberOfSeats, setNumberOfSeats] = useState();
+  const [setup, setSetup] = useState();
+  const [status, setStatus] = useState();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,7 +20,6 @@ const AddTable = () => {
         setup,
         status,
       });
-      console.log(response.data);
       if (response?.payload) {
         toast.success(response.message);
         console.log(response.message);
@@ -30,7 +28,7 @@ const AddTable = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Đã xảy ra lỗi khi tạo bàn");
+      toast.error("Something went wrong in input form");
     }
   };
 
@@ -77,18 +75,20 @@ const AddTable = () => {
                     onChange={(e) => setNumberOfSeats(e.target.value)}
                   />
                 </div>
-
                 <div className="form-group col-md-3">
                   <label className="control-label">Setup</label>
                   <div className="input-group">
                     <select
-                      className="custom-select form-control"
-                      value={setup}
-                      onChange={(e) => setSetup(e.target.value)}
+                      className="form-control"
+                      id="exampleSelect4"
+                      required
+                      onChange={(e) => {
+                        setSetup(e.target.value);
+                      }}
                     >
-                      <option value="">Chọn</option>
-                      <option value="Có sẵn">Có sẵn</option>
-                      <option value="Không có sẵn">Không có sẵn</option>
+                      <option>-- Chọn --</option>
+                      <option>Có sẵn</option>
+                      <option>Không có sẵn</option>
                     </select>
                     <div className="input-group-append">
                       <span className="input-group-text">
@@ -102,13 +102,16 @@ const AddTable = () => {
                   <label className="control-label">Trạng thái</label>
                   <div className="input-group">
                     <select
-                      className="custom-select form-control"
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
+                      className="form-control"
+                      id="exampleSelect5"
+                      required
+                      onChange={(e) => {
+                        setStatus(e.target.value);
+                      }}
                     >
-                      <option value="">Chọn</option>
-                      <option value="Đang trống">Đang trống</option>
-                      <option value="Đã đặt">Đã đặt</option>
+                      <option>-- Chọn --</option>
+                      <option>Đang trống</option>
+                      <option>Đã đặt</option>
                     </select>
                     <div className="input-group-append">
                       <span className="input-group-text">
@@ -121,12 +124,13 @@ const AddTable = () => {
                 <button className="btn btn-info" type="submit">
                   Lưu lại
                 </button>
-                <a
+                <button
                   className="btn btn-danger"
+                  type="button"
                   onClick={() => navigate("/main/tablesmanager")}
                 >
                   Trở về
-                </a>
+                </button>
               </form>
             </div>
           </div>

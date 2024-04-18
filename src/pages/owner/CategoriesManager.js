@@ -20,7 +20,7 @@ const CategoriesManager = () => {
         console.log(response.message)
         setName();
         setPhoto();
-        setCategories([...categories, response.payload]); // Thêm danh mục mới vào danh sách
+        setCategories([...categories, response.payload]); 
       } 
     } catch (error) {
       console.log(error);

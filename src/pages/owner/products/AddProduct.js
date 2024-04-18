@@ -49,8 +49,7 @@ const AddProduct = () => {
       if (response?.payload) {
         toast.success(response.message);
         console.log(response.message);
-        // setName(response.payload);
-        setProducts([...products, response.payload]); // Thêm danh mục mới vào danh sách
+        setProducts([...products, response.payload]); 
         navigate("/main/productsmanager");
       }
       console.log(subphoto);
@@ -240,12 +239,12 @@ const AddProduct = () => {
                 <button className="btn btn-info" type="submit">
                   Lưu lại
                 </button>
-                <a
+                <button
                   className="btn btn-danger"
                   onClick={() => navigate("/main/productsmanager")}
                 >
                   Trở về
-                </a>
+                </button>
               </form>
             </div>
           </div>

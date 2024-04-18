@@ -30,11 +30,30 @@
     flex-direction: column;
   }
 
-  .invoice-totals div label{
-    margin-right: 40px;
-    font-weight: bold;
-    margin-left: 117px;
+  .invoice-totals div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
   }
+  
+  .invoice-totals div label {
+    margin-right: 20px;
+    font-weight: bold;
+  }
+  
+  .invoice-totals div input,
+  .invoice-totals div select {
+    flex-grow: 1; 
+    padding: 5px;
+    margin-left: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  .invoice-totals div:last-child input,
+  .invoice-totals div:last-child select {
+    margin-right: 0; 
+  }
+  
   
   .invoice-container label {
     margin-bottom: 5px;
@@ -92,6 +111,18 @@
     background-color: #4CAF50; /* Green */
     color: white;
   }
+
+  .invoice-header button {
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #0088cc;
+    border: none;
+    color: white;
+    width: 40px;
+    height: auto;
+    margin-left: 80px;
+    margin-top: 10px;
+  }
   
   .invoice-footer button:nth-child(2) {
     background-color: #f0ad4e; /* Orange */
@@ -103,6 +134,10 @@
   
   .invoice-totals div {
     margin-bottom: 10px;
+  }
+
+  .invoice-header label,  .invoice-header span{
+    font-weight: bold;
   }
 
   

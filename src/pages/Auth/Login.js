@@ -55,7 +55,7 @@ const Login = () => {
           })
         );
         alert("login success!");
-        navigate(location.state?.from || "/main");
+        navigate(location.state?.from || "/main/amindashboard");
       }
     } catch (error) {
       console.error(error);

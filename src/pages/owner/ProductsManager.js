@@ -112,7 +112,7 @@ const ProductsManager = () => {
                 description: udescription,
                 categoryId: categoryId,
                 supplierId: supplierId,
-              }; // Cập nhật tên của danh mục tương ứng
+              };
             }
             return product;
           })
