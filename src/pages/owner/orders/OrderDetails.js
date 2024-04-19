@@ -3,6 +3,7 @@ import axiosClient from "../../../libraries/axiosClient";
 import { useNavigate, useParams } from "react-router-dom";
 import "./OrderDetails.css";
 import { FaPlusSquare } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -14,15 +15,17 @@ const OrderDetails = () => {
   useEffect(() => {
     const getOrderDetails = async () => {
       try {
-        const response = await axiosClient.get(`questions/listorders1?status=${status}&id=${id}`);
+        const response = await axiosClient.get(`questions/listorders1?id=${id}`);
         setOrderDetails(response.payload); // Cập nhật thông tin đơn hàng vào state
       } catch (error) {
         console.error(error);
       }
     };
-
+  
     getOrderDetails(); // Gọi hàm để lấy thông tin đơn hàng khi component mount
-  }, [id][status]);
+  }, [id]); // Mảng phụ thuộc đã được sửa
+
+  
 
   // Hàm biến đổi định dạng ngày
   const formatDate = (dateString) => {
@@ -55,13 +58,11 @@ const OrderDetails = () => {
             <div className="tile-body">
               <div className="tile-body">
                 <div className="col-sm-2"></div>
-
+      
                 {orderDetails && orderDetails
-                  .filter(
-                    (e) => status === "" || e.order.status === status
-                  )
+                  .filter((order) => order.order._id === id)
                   .map((e) => (
-                  <div key={e.order._id} className="invoice-container">
+                  <div key={e.order._id} className="invoice-container" >
                     <div className="invoice-header ">
                       <div>
                         <label>Bàn</label>
@@ -115,7 +116,7 @@ const OrderDetails = () => {
                               <td>
                                 <input
                                   className="form-control"
-                                  type="text"
+                                  type="number"
                                   required
                                   value={orderDetail.quantity}
                                 />
@@ -123,7 +124,7 @@ const OrderDetails = () => {
                               <td>
                                 <input
                                   className="form-control"
-                                  type="text"
+                                  type="number"
                                   required
                                   value={orderDetail.productPrice}
                                 />
@@ -131,7 +132,7 @@ const OrderDetails = () => {
                               <td>
                                 <input
                                   className="form-control"
-                                  type="text"
+                                  type="number"
                                   required
                                   value={orderDetail.productDiscount}
                                 />
@@ -199,7 +200,7 @@ const OrderDetails = () => {
                     </div>
                   </div>
                 ))}
-                <button className="btn btn-save" type="submit">
+                <button className="btn btn-save" type="submit" >
                   Lưu lại
                 </button>
                 <button

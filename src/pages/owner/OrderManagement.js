@@ -1,92 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import axiosClient from "../../libraries/axiosClient";
-import { useAuth } from "../../context/auth";
 import { NavLink } from "react-router-dom";
-import OrderDetails from "./orders/OrderDetails";
+
 
 const OrderManagement = () => {
   const [listorders, setListorders] = useState([]);
-  const [utable, setUTable] = useState();
-  const [ufirstName, setUFirstName] = useState();
-  const [ulastName, setULastName] = useState();
-  const [ucreatedDate, setUCreatedDate] = useState();
-  const [uproductName, setUProductName] = useState();
-  const [uquantity, setUPuantity] = useState();
-  const [uproductPrice, setUProductPrice] = useState();
-  const [utotalOrderDetailPrice, setUTotalOrderDetailPrice] = useState();
-  const [utotalamountdiscount, setUTotalamountdiscount] = useState();
-  const [udiscount, setUDiscount] = useState();
-  const [utotalOrderPrice, setUTotalOrderPrice] = useState();
-  const [ustatus, setUStatus] = useState();
   const [status, setStatus] = useState("");
+  const [selected,setSelected] = useState(null)
 
-  const [selected, setSelected] = useState(null);
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axiosClient.patch(
-        `questions/listorders1/${selected._id}`,
-        {
-          table: utable,
-          firstName: ufirstName,
-          lastName: ulastName,
-          createdDate: ucreatedDate,
-          productName: uproductName,
-          quantity: uquantity,
-          productPrice: uproductPrice,
-          totalOrderDetailPrice: utotalOrderDetailPrice,
-          totalamountdiscount: utotalamountdiscount,
-          discount: udiscount,
-          totalOrderPrice: utotalOrderPrice,
-          status: ustatus,
-        }
-      );
-      if (response.success) {
-        toast.success(" is updated");
-        setSelected(null);
-        setUTable("");
-        setUFirstName("");
-        setUDiscount("");
-        setULastName("");
-        setUCreatedDate("");
-        setUProductName("");
-        setUPuantity("");
-        setUProductPrice("");
-        setUTotalOrderDetailPrice("");
-        setUTotalamountdiscount("");
-        setUTotalOrderPrice("");
-        setUStatus("");
-        setListorders(
-          listorders.map((product) => {
-            if (product._id === selected._id) {
-              return {
-                ...product,
-                table: utable,
-                firstName: ufirstName,
-                lastName: ulastName,
-                createdDate: ucreatedDate,
-                productName: uproductName,
-                quantity: uquantity,
-                productPrice: uproductPrice,
-                totalOrderDetailPrice: utotalOrderDetailPrice,
-                totalamountdiscount: utotalamountdiscount,
-                discount: udiscount,
-                totalOrderPrice: utotalOrderPrice,
-                status: ustatus,
-              };
-            }
-            return product;
-          })
-        );
-        getlistorders();
-      }
-    } catch (error) {
-      console.log(error.message);
-      toast.error("Something went wrong");
-    }
-  };
 
   const handleDelete = async (pId) =>{
     try {
@@ -100,6 +22,8 @@ const OrderManagement = () => {
         toast.error('Something went wrong')
     }
   };
+
+
 
 
   const getlistorders = async () => {
@@ -218,7 +142,7 @@ const OrderManagement = () => {
                                       <i className="fas fa-trash-alt"></i>
                                     </button>
 
-                                    <NavLink to={`/main/ordermanagement/orderdetails/${e.order._id}`} >
+                                    <NavLink to={`/main/ordermanagement/orderdetails/${e.order._id}`}>
                                       <button
                                         className="btn btn-primary btn-sm edit"
                                         title="Xem chi tiết"
@@ -226,6 +150,7 @@ const OrderManagement = () => {
                                         <i className="fas fa-edit icon"></i>
                                       </button>
                                     </NavLink>
+
 
                                     
                                   </td>
