@@ -123,7 +123,7 @@ const OrderManagement = () => {
                                 )}
                                 {e.orderDetails.indexOf(orderDetail) === 0 && (
                                   <td className="totalor">
-                                    {e.totalOrderPrice} đ
+                                    {e.totalamountdiscount} đ
                                   </td>
                                 )}
                                 {e.orderDetails.indexOf(orderDetail) === 0 && (

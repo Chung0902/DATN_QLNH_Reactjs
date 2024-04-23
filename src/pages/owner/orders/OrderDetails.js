@@ -9,21 +9,125 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const [orderDetails, setOrderDetails] = useState([]);
   const { id } = useParams(); // Lấy id từ đường dẫn
-  const [status, setStatus] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [selected,setSelected] = useState(null)
+  const [ustatus,setUStatus] = useState();
+  const [udiscount,setUDiscount] = useState();
+  const [uquantity,setUQuantity] = useState();
+  const [orderDetailsId,setOrderDetailsId] = useState();
+  const [tableId,setTableId] = useState();
+  const [customerId,setCustomerId] = useState();
+  const [showNewRow, setShowNewRow] = useState(false);
+  const [newRows, setNewRows] = useState([]);
+
+const handleAddNewItem = () => {
+  setShowNewRow(true);
+  setNewRows(prevRows => [
+    ...prevRows,
+    {
+      productName: "",
+      quantity: "",
+      productPrice: "",
+      productDiscount: "",
+      totalOrderDetailPrice: ""
+    }
+  ]);
+};
+
+const handleNewRowChange = (e, index, field) => {
+  const { value } = e.target;
+  setNewRows((prevRows) => {
+    const updatedRows = [...prevRows];
+    updatedRows[index] = { ...updatedRows[index], [field]: value };
+    return updatedRows;
+  });
+};
+
+const handleDeleteNewRow = (index) => {
+  setNewRows((prevRows) => {
+    const updatedRows = [...prevRows];
+    updatedRows.splice(index, 1);
+    return updatedRows;
+  });
+};
+
+
+
 
 
   useEffect(() => {
     const getOrderDetails = async () => {
       try {
         const response = await axiosClient.get(`questions/listorders1?id=${id}`);
-        setOrderDetails(response.payload); // Cập nhật thông tin đơn hàng vào state
+        setOrderDetails(response.payload);
       } catch (error) {
         console.error(error);
       }
     };
-  
-    getOrderDetails(); // Gọi hàm để lấy thông tin đơn hàng khi component mount
-  }, [id]); // Mảng phụ thuộc đã được sửa
+    getOrderDetails();
+  }, [id]);
+
+  const getAllOrders = async () => {
+    try {
+      const response = await axiosClient.get('questions/listorders1');
+      setOrderDetails(response.payload);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() =>{
+    getAllOrders();
+  },[]);
+
+  //update orders
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+    
+      const response = await axiosClient.patch(
+        `admin/orders/${selected._id}`,
+        {
+          status: ustatus,
+          discount: udiscount,
+          quantity: uquantity,
+          orderDetailsId: orderDetailsId,
+          tableId: tableId,
+          customerId: customerId
+        }
+      );
+      if (response.success) {
+        toast.success(" is updated");
+        setSelected(null);
+        setUStatus("");
+        setUDiscount("");
+        setUQuantity("");
+        setOrderDetailsId("");
+        setTableId("");
+        setCustomerId("");
+        setOrders(
+          orders.map((order) => {
+            if (order._id === selected._id) {
+              return {
+                ...order,
+                status: ustatus,
+                discount: udiscount,
+                quantity: uquantity,
+                orderDetailsId: orderDetailsId,
+                tableId: tableId,
+                customerId: customerId,
+              };
+            }
+            return order;
+          })
+        );
+        getAllOrders();
+      }
+    } catch (error) {
+      console.log(error.message);
+      toast.error("Something went wrong");
+    }
+  };
 
   
 
@@ -35,6 +139,7 @@ const OrderDetails = () => {
     const year = date.getFullYear().toString().slice(0);
     return `${day}/${month}/${year}`;
   };
+
 
   return (
     <main className="app-content">
@@ -71,6 +176,7 @@ const OrderDetails = () => {
                           type="text"
                           required
                           value={e.order.table}
+                          onChange={(e) => setTableId(e.target.value)}
                         />
                       </div>
 
@@ -81,11 +187,12 @@ const OrderDetails = () => {
                           type="text"
                           required
                           value={`${e.order.customer.firstName}${e.order.customer.lastName}`}
+                          onChange={(e) => setCustomerId(e.target.value)}
                         />
                       </div>
                       <div>
                         <span>Ngày đặt: {formatDate(e.order.createdDate)}</span>
-                        <button type="button" title="Thêm món ăn">
+                        <button type="button" title="Thêm món ăn" onClick={handleAddNewItem}>
                           <FaPlusSquare />
                         </button>
                       </div>
@@ -103,14 +210,15 @@ const OrderDetails = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {e.orderDetails.map((orderDetail) => (
-                            <tr key={orderDetail.productId}>
+                          {e.orderDetails.map((orderDetail, index) => (
+                            <tr key={index}>
                               <td>
                                 <input
                                   className="form-control"
                                   type="text"
                                   required
                                   value={orderDetail.productName}
+                                  onChange={(e) => setOrderDetailsId(e.target.value)}
                                 />
                               </td>
                               <td>
@@ -119,6 +227,7 @@ const OrderDetails = () => {
                                   type="number"
                                   required
                                   value={orderDetail.quantity}
+                                  onChange={(e) => setUQuantity(e.target.value)}
                                 />
                               </td>
                               <td>
@@ -135,6 +244,7 @@ const OrderDetails = () => {
                                   type="number"
                                   required
                                   value={orderDetail.productDiscount}
+                                  onChange={(e) => setUDiscount(e.target.value)}
                                 />
                               </td>
                               <td>
@@ -152,6 +262,61 @@ const OrderDetails = () => {
                               </td>
                             </tr>
                           ))}
+                          {showNewRow && newRows.map((row, index) => (
+  <tr key={index}>
+    <td>
+      <input
+        className="form-control"
+        type="text"
+        required
+        value={row.productName}
+        onChange={(e) => handleNewRowChange(e, index, 'productName')}
+      />
+    </td>
+    <td>
+      <input
+        className="form-control"
+        type="number"
+        required
+        value={row.quantity}
+        onChange={(e) => handleNewRowChange(e, index, 'quantity')}
+      />
+    </td>
+    <td>
+      <input
+        className="form-control"
+        type="number"
+        required
+        value={row.productPrice}
+        readOnly
+      />
+    </td>
+    <td>
+      <input
+        className="form-control"
+        type="number"
+        required
+        value={row.productDiscount}
+        onChange={(e) => handleNewRowChange(e, index, 'productDiscount')}
+      />
+    </td>
+    <td>
+      <input
+        className="form-control"
+        type="text"
+        required
+        value={row.totalOrderDetailPrice}
+        readOnly
+      />
+    </td>
+    <td>
+      <button type="button" title="Xóa món ăn" onClick={() => handleDeleteNewRow(index)}>
+        X
+      </button>
+    </td>
+  </tr>
+))}
+
                         </tbody>
                       </table>
                     </div>
@@ -173,6 +338,7 @@ const OrderDetails = () => {
                           type="text"
                           required
                           value={e.order.discount}
+                          onChange={(e) => setUDiscount(e.target.value)}
                         />
                       </div>
                       
@@ -190,6 +356,7 @@ const OrderDetails = () => {
                         <select
                           // className="form-control"
                           value={e.order.status}
+                          onChange={(e) => setUStatus(e.target.value)}
                         >
                           <option value="COMPLETED">COMPLETED</option>
                           <option value="WAITING">WAITING</option>
@@ -200,7 +367,7 @@ const OrderDetails = () => {
                     </div>
                   </div>
                 ))}
-                <button className="btn btn-save" type="submit" >
+                <button className="btn btn-save" type="submit" onClick={handleUpdate}>
                   Lưu lại
                 </button>
                 <button
