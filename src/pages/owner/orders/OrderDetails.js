@@ -21,6 +21,11 @@ const OrderDetails = () => {
   const [newRows, setNewRows] = useState([]);
 
   const [products, setProducts] = useState([]);
+  const [order, setOrder] = useState([]);
+
+  const [triggerReload, setTriggerReload] = useState(false);
+
+
 
   const getAllProducts = async () => {
     try {
@@ -34,6 +39,7 @@ const OrderDetails = () => {
       console.error(error);
     }
   };
+  
 
   useEffect(() => {
     getAllProducts();
@@ -99,6 +105,46 @@ const OrderDetails = () => {
     });
   };
 
+  const handleSave = async () => {
+    try {
+      const newOrderDetails = newRows.map((row) => ({
+        productId: row.productId,
+        quantity: row.quantity,
+        price: row.productPrice,
+      }));
+  
+      const response = await axiosClient.patch(`admin/orders/${id}`, {
+        orderDetails: newOrderDetails,
+      });
+  
+      // if (response.success) {
+      //   toast.success("Thêm món ăn vào đơn hàng thành công!");
+      //   setNewRows([]);
+      //   // Cập nhật triggerReload để tự động load lại giao diện
+      //   setTriggerReload(true);
+      // } else {
+      //   toast.error("Có lỗi xảy ra khi thêm món ăn vào đơn hàng!");
+      // }
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.error("Có lỗi xảy ra khi thêm món ăn vào đơn hàng!");
+    }
+  };
+  const getOrders = async () => {
+    try {
+      const response = await axiosClient.get("admin/orders");
+      setOrder(response.payload);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getOrders();
+  }, []);
+  
+
   useEffect(() => {
     const getOrderDetails = async () => {
       try {
@@ -111,7 +157,8 @@ const OrderDetails = () => {
       }
     };
     getOrderDetails();
-  }, [id]);
+  }, [id, triggerReload]); // Thêm triggerReload vào dependency array
+  
 
   const getAllOrders = async () => {
     try {
@@ -125,51 +172,6 @@ const OrderDetails = () => {
   useEffect(() => {
     getAllOrders();
   }, []);
-
-  //update orders
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axiosClient.patch(`admin/orders/${selected._id}`, {
-        status: ustatus,
-        discount: udiscount,
-        quantity: uquantity,
-        orderDetailsId: orderDetailsId,
-        tableId: tableId,
-        customerId: customerId,
-      });
-      if (response.success) {
-        toast.success(" is updated");
-        setSelected(null);
-        setUStatus("");
-        setUDiscount("");
-        setUQuantity("");
-        setOrderDetailsId("");
-        setTableId("");
-        setCustomerId("");
-        setOrders(
-          orders.map((order) => {
-            if (order._id === selected._id) {
-              return {
-                ...order,
-                status: ustatus,
-                discount: udiscount,
-                quantity: uquantity,
-                orderDetailsId: orderDetailsId,
-                tableId: tableId,
-                customerId: customerId,
-              };
-            }
-            return order;
-          })
-        );
-        getAllOrders();
-      }
-    } catch (error) {
-      console.log(error.message);
-      toast.error("Something went wrong");
-    }
-  };
 
   // Hàm biến đổi định dạng ngày
   const formatDate = (dateString) => {
@@ -458,10 +460,10 @@ const OrderDetails = () => {
                     ))}
                 <button
                   className="btn btn-save"
-                  type="submit"
-                  onClick={handleUpdate}
+                  type="button"
+                  onClick={handleSave}
                 >
-                  Lưu lại
+                  Lưu
                 </button>
                 <button
                   type="button"
