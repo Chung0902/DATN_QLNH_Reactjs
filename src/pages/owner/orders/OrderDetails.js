@@ -25,7 +25,23 @@ const OrderDetails = () => {
 
   const [triggerReload, setTriggerReload] = useState(false);
 
-
+  // const handleDeleteOrderDetail = async (id) => {
+  //   try {
+  //     // Gọi API để xóa sản phẩm trong chi tiết đơn hàng
+  //     const response = await axiosClient.delete(`admin/orders/${id}`);
+  //     if (response.success) {
+  //       toast.success("Xóa sản phẩm thành công!");
+  //       // Sau khi xóa thành công, cập nhật lại danh sách chi tiết đơn hàng
+  //       // hoặc có thể làm các thay đổi khác tùy theo nhu cầu của bạn
+  //       setOrderDetails(orderDetails.filter(orderDetail => orderDetail._id !== id));
+  //     } else {
+  //       toast.error("Có lỗi xảy ra khi xóa sản phẩm!");
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Có lỗi xảy ra khi xóa sản phẩm!");
+  //   }
+  // };
 
   const getAllProducts = async () => {
     try {
@@ -39,7 +55,6 @@ const OrderDetails = () => {
       console.error(error);
     }
   };
-  
 
   useEffect(() => {
     getAllProducts();
@@ -112,11 +127,11 @@ const OrderDetails = () => {
         quantity: row.quantity,
         price: row.productPrice,
       }));
-  
+
       const response = await axiosClient.patch(`admin/orders/${id}`, {
         orderDetails: newOrderDetails,
       });
-  
+
       // if (response.success) {
       //   toast.success("Thêm món ăn vào đơn hàng thành công!");
       //   setNewRows([]);
@@ -131,6 +146,7 @@ const OrderDetails = () => {
       toast.error("Có lỗi xảy ra khi thêm món ăn vào đơn hàng!");
     }
   };
+
   const getOrders = async () => {
     try {
       const response = await axiosClient.get("admin/orders");
@@ -143,7 +159,6 @@ const OrderDetails = () => {
   useEffect(() => {
     getOrders();
   }, []);
-  
 
   useEffect(() => {
     const getOrderDetails = async () => {
@@ -158,7 +173,6 @@ const OrderDetails = () => {
     };
     getOrderDetails();
   }, [id, triggerReload]); // Thêm triggerReload vào dependency array
-  
 
   const getAllOrders = async () => {
     try {
@@ -180,6 +194,25 @@ const OrderDetails = () => {
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear().toString().slice(0);
     return `${day}/${month}/${year}`;
+  };
+
+  const handleStatusChange = (e, id) => {
+    const { value } = e.target;
+    setOrderDetails((prevDetails) => {
+      const updatedDetails = prevDetails.map((detail) => {
+        if (detail.order._id === id) {
+          return {
+            ...detail,
+            order: {
+              ...detail.order,
+              status: value, // Cập nhật trạng thái mới
+            },
+          };
+        }
+        return detail;
+      });
+      return updatedDetails;
+    });
   };
 
   return (
@@ -254,7 +287,7 @@ const OrderDetails = () => {
                                 <th>Giá</th>
                                 <th>Giảm giá</th>
                                 <th>Tổng tiền</th>
-                                <th>Action</th>
+                                <th></th>
                               </tr>
                             </thead>
                             <tbody>
@@ -310,11 +343,6 @@ const OrderDetails = () => {
                                       value={orderDetail.totalOrderDetailPrice}
                                       readOnly
                                     />
-                                  </td>
-                                  <td>
-                                    <button type="button" title="Xóa món ăn">
-                                      X
-                                    </button>
                                   </td>
                                 </tr>
                               ))}
@@ -445,9 +473,8 @@ const OrderDetails = () => {
                           <div>
                             <label>Trạng thái</label>
                             <select
-                              // className="form-control"
                               value={e.order.status}
-                              onChange={(e) => setUStatus(e.target.value)}
+                              onChange={(e) => handleStatusChange(e, id)} // Truyền id thay vì e.order._id
                             >
                               <option value="COMPLETED">COMPLETED</option>
                               <option value="WAITING">WAITING</option>
