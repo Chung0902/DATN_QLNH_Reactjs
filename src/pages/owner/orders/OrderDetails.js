@@ -24,6 +24,7 @@ const OrderDetails = () => {
   const [order, setOrder] = useState([]);
 
   const [triggerReload, setTriggerReload] = useState(false);
+  const [newStatus, setNewStatus] = useState(""); 
 
   // const handleDeleteOrderDetail = async (id) => {
   //   try {
@@ -122,30 +123,65 @@ const OrderDetails = () => {
 
   const handleSave = async () => {
     try {
-      const newOrderDetails = newRows.map((row) => ({
-        productId: row.productId,
-        quantity: row.quantity,
-        price: row.productPrice,
-      }));
-
-      const response = await axiosClient.patch(`admin/orders/${id}`, {
-        orderDetails: newOrderDetails,
+      // Cập nhật trạng thái của đơn hàng
+      const statusResponse = await axiosClient.patch(`admin/orders/${id}/status`, {
+        status: newStatus 
       });
-
-      // if (response.success) {
-      //   toast.success("Thêm món ăn vào đơn hàng thành công!");
-      //   setNewRows([]);
-      //   // Cập nhật triggerReload để tự động load lại giao diện
-      //   setTriggerReload(true);
-      // } else {
-      //   toast.error("Có lỗi xảy ra khi thêm món ăn vào đơn hàng!");
-      // }
-      window.location.reload();
+  
+      if (statusResponse.status === 200) {
+        // Nếu cập nhật trạng thái thành công, tiếp tục thêm món ăn vào đơn hàng
+        const newOrderDetails = newRows.map((row) => ({
+          productId: row.productId,
+          quantity: row.quantity,
+          price: row.productPrice,
+        }));
+  
+        const response = await axiosClient.patch(`admin/orders/${id}`, {
+          orderDetails: newOrderDetails,
+        });
+  
+        if (response.status === 200) {
+          // Nếu cả hai đều thành công, hiển thị thông báo hoặc thực hiện các hành động khác tùy thuộc vào yêu cầu của bạn
+          toast.success("Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!");
+          setNewRows([]);
+          // Cập nhật triggerReload để tự động load lại giao diện
+          setTriggerReload(true);
+        } else {
+          // Nếu thêm món ăn không thành công, hiển thị thông báo lỗi hoặc xử lý lỗi tương ứng
+          toast.error("Thêm món ăn vào đơn hàng thất bại!");
+        }
+      } else {
+        // Nếu cập nhật trạng thái không thành công, hiển thị thông báo lỗi hoặc xử lý lỗi tương ứng
+        toast.error("Cập nhật trạng thái đơn hàng thất bại!");
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Có lỗi xảy ra khi thêm món ăn vào đơn hàng!");
+      // Xử lý lỗi nếu có
+      toast.error("Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!");
     }
   };
+
+  const handleStatusChange = (e, id, newStatus) => {
+    const { value } = e.target;
+    setNewStatus(value);
+    setOrderDetails((prevDetails) => {
+      const updatedDetails = prevDetails.map((detail) => {
+        if (detail.order._id === id) {
+          return {
+            ...detail,
+            order: {
+              ...detail.order,
+              status: value, // Cập nhật trạng thái mới
+            },
+          };
+        }
+        return detail;
+      });
+      return updatedDetails;
+    });
+  };
+
+  
 
   const getOrders = async () => {
     try {
@@ -196,25 +232,7 @@ const OrderDetails = () => {
     return `${day}/${month}/${year}`;
   };
 
-  const handleStatusChange = (e, id) => {
-    const { value } = e.target;
-    setOrderDetails((prevDetails) => {
-      const updatedDetails = prevDetails.map((detail) => {
-        if (detail.order._id === id) {
-          return {
-            ...detail,
-            order: {
-              ...detail.order,
-              status: value, // Cập nhật trạng thái mới
-            },
-          };
-        }
-        return detail;
-      });
-      return updatedDetails;
-    });
-  };
-
+ 
   return (
     <main className="app-content">
       <div className="app-title">
@@ -474,12 +492,12 @@ const OrderDetails = () => {
                             <label>Trạng thái</label>
                             <select
                               value={e.order.status}
-                              onChange={(e) => handleStatusChange(e, id)} // Truyền id thay vì e.order._id
+                              onChange={(e) => handleStatusChange(e, id, newStatus)}
                             >
-                              <option value="COMPLETED">COMPLETED</option>
                               <option value="WAITING">WAITING</option>
-                              <option value="CANCELED">CANCELED</option>
                               <option value="DELIVERING">DELIVERING</option>
+                              <option value="COMPLETED">COMPLETED</option>
+                              <option value="CANCELED">CANCELED</option>
                             </select>
                           </div>
                         </div>
