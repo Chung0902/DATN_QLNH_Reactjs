@@ -2,29 +2,26 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import axiosClient from "../../libraries/axiosClient";
 import { NavLink } from "react-router-dom";
-
+import "././orders/OrderManagement.css"
 
 const OrderManagement = () => {
   const [listorders, setListorders] = useState([]);
   const [status, setStatus] = useState("");
-  const [selected,setSelected] = useState(null)
+  const [selected, setSelected] = useState(null);
+  const [pageNumber, setPageNumber] = useState(0);
+  const ordersPerPage = 10; // Số lượng đơn hàng mỗi trang
 
-
-  const handleDelete = async (pId) =>{
+  const handleDelete = async (pId) => {
     try {
-        const response = await axiosClient.delete(`questions/listorders1/${pId}`);
-        if(response?.success){
-            toast.success(`orders is deleted`);
-            setListorders(listorders.filter((listorder) => listorder._id !== pId)); 
-        }
-        
+      const response = await axiosClient.delete(`questions/listorders1/${pId}`);
+      if (response?.success) {
+        toast.success(`orders is deleted`);
+        setListorders(listorders.filter((listorder) => listorder._id !== pId));
+      }
     } catch (error) {
-        toast.error('Something went wrong')
+      toast.error("Something went wrong");
     }
   };
-
-
-
 
   const getlistorders = async () => {
     try {
@@ -41,13 +38,17 @@ const OrderManagement = () => {
     getlistorders();
   }, [status]);
 
-  // Hàm biến đổi định dạng ngày sinh
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear().toString().slice(0);
     return `${day}/${month}/${year}`;
+  };
+
+  const pageCount = Math.ceil(listorders.length / ordersPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
   };
 
   return (
@@ -71,6 +72,7 @@ const OrderManagement = () => {
                   className="table table-hover table-bordered"
                   id="sampleTable"
                 >
+                  {/* Table headers */}
                   <thead>
                     <tr>
                       <th>ID đơn hàng</th>
@@ -78,7 +80,6 @@ const OrderManagement = () => {
                       <th>Ngày tạo</th>
                       <th>SL món ăn</th>
                       <th>Tổng tiền</th>
-                      {/* <th>PTTT</th> */}
                       <th>
                         <select
                           className="border-0 bg-secondary-subtle fw-semibold"
@@ -95,72 +96,97 @@ const OrderManagement = () => {
                       <th>Tính năng</th>
                     </tr>
                   </thead>
+                  {/* Table body */}
                   <tbody>
-                    {listorders &&
-                      listorders
-                        .filter(
-                          (e) => status === "" || e.order.status === status
+                    {(listorders.length > 0
+                      ? listorders.slice(
+                          pageNumber * ordersPerPage,
+                          pageNumber * ordersPerPage + ordersPerPage
                         )
-                        .map((e) => (
-                          <React.Fragment key={e.order._id}>
-                            {/* Hiển thị thông tin khách hàng cho mỗi đơn hàng */}
-                            <tr>
-                              <td rowSpan={e.orderDetails.length + 1}>
-                                {e.order._id}
+                      : []
+                    ).map((e) => (
+                      <React.Fragment key={e.order._id}>
+                        {/* Hiển thị thông tin khách hàng cho mỗi đơn hàng */}
+                        <tr>
+                          <td rowSpan={e.orderDetails.length + 1}>
+                            {e.order._id}
+                          </td>
+                          <td rowSpan={e.orderDetails.length + 1}>
+                            {e.order.table}
+                          </td>
+                          <td rowSpan={e.orderDetails.length + 1}>
+                            {formatDate(e.order.createdDate)}
+                          </td>
+                        </tr>
+                        {/* Hiển thị thông tin sản phẩm cho mỗi đơn hàng */}
+                        {e.orderDetails.map((orderDetail) => (
+                          <tr key={orderDetail.productId}>
+                            {e.orderDetails.indexOf(orderDetail) === 0 && (
+                              <td>{e.totalProductQuantity}</td>
+                            )}
+                            {e.orderDetails.indexOf(orderDetail) === 0 && (
+                              <td className="totalor">
+                                {e.totalamountdiscount} đ
                               </td>
-                              <td rowSpan={e.orderDetails.length + 1}>
-                                {e.order.table}
+                            )}
+                            {e.orderDetails.indexOf(orderDetail) === 0 && (
+                              <td className="status_or">{e.order.status}</td>
+                            )}
+                            {e.orderDetails.indexOf(orderDetail) === 0 && (
+                              <td>
+                                <button
+                                  className="btn btn-primary btn-sm trash"
+                                  type="button"
+                                  title="Xóa"
+                                  onClick={() => {
+                                    handleDelete(e.order._id);
+                                  }}
+                                >
+                                  <i className="fas fa-trash-alt"></i>
+                                </button>
+
+                                <NavLink
+                                  to={`/main/ordermanagement/orderdetails/${e.order._id}`}
+                                >
+                                  <button
+                                    className="btn btn-primary btn-sm edit"
+                                    title="Xem chi tiết"
+                                  >
+                                    <i className="fas fa-edit icon"></i>
+                                  </button>
+                                </NavLink>
                               </td>
-                              <td rowSpan={e.orderDetails.length + 1}>
-                                {formatDate(e.order.createdDate)}
-                              </td>
-                            </tr>
-                            {/* Hiển thị thông tin sản phẩm cho mỗi đơn hàng */}
-                            {e.orderDetails.map((orderDetail) => (
-                              <tr key={orderDetail.productId}>
-                                {e.orderDetails.indexOf(orderDetail) === 0 && (
-                                  <td>{e.totalProductQuantity}</td>
-                                )}
-                                {e.orderDetails.indexOf(orderDetail) === 0 && (
-                                  <td className="totalor">
-                                    {e.totalamountdiscount} đ
-                                  </td>
-                                )}
-                                {e.orderDetails.indexOf(orderDetail) === 0 && (
-                                  <td className="status_or">
-                                    {e.order.status}
-                                  </td>
-                                )}
-                                {e.orderDetails.indexOf(orderDetail) === 0 && (
-                                  <td>
-                                    <button
-                                      className="btn btn-primary btn-sm trash"
-                                      type="button"
-                                      title="Xóa"
-                                      onClick={() => { handleDelete(e.order._id)}}
-                                    >
-                                      <i className="fas fa-trash-alt"></i>
-                                    </button>
-
-                                    <NavLink to={`/main/ordermanagement/orderdetails/${e.order._id}`}>
-                                      <button
-                                        className="btn btn-primary btn-sm edit"
-                                        title="Xem chi tiết"
-                                      >
-                                        <i className="fas fa-edit icon"></i>
-                                      </button>
-                                    </NavLink>
-
-
-                                    
-                                  </td>
-                                )}
-                              </tr>
-                            ))}
-                          </React.Fragment>
+                            )}
+                          </tr>
                         ))}
+                      </React.Fragment>
+                    ))}
                   </tbody>
                 </table>
+                {/* Pagination */}
+                <div className="pagination">
+                  <button
+                    onClick={() => setPageNumber(0)}
+                    disabled={pageNumber === 0}
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: pageCount }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setPageNumber(index)}
+                      className={pageNumber === index ? "active" : ""}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setPageNumber(pageCount - 1)}
+                    disabled={pageNumber === pageCount - 1}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>

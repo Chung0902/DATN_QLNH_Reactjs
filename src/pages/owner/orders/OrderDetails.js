@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "./OrderDetails.css";
 import { FaPlusSquare } from "react-icons/fa";
 import { toast } from "react-hot-toast";
+import ReactPaginate from "react-paginate";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -19,12 +20,11 @@ const OrderDetails = () => {
   const [customerId, setCustomerId] = useState();
   const [showNewRow, setShowNewRow] = useState(false);
   const [newRows, setNewRows] = useState([]);
-
   const [products, setProducts] = useState([]);
   const [order, setOrder] = useState([]);
-
-  const [triggerReload, setTriggerReload] = useState(false);
   const [newStatus, setNewStatus] = useState(""); 
+ 
+
 
   // const handleDeleteOrderDetail = async (id) => {
   //   try {
@@ -123,43 +123,48 @@ const OrderDetails = () => {
 
   const handleSave = async () => {
     try {
-      // Cập nhật trạng thái của đơn hàng
-      const statusResponse = await axiosClient.patch(`admin/orders/${id}/status`, {
-        status: newStatus 
-      });
-  
-      if (statusResponse.status === 200) {
-        // Nếu cập nhật trạng thái thành công, tiếp tục thêm món ăn vào đơn hàng
-        const newOrderDetails = newRows.map((row) => ({
-          productId: row.productId,
-          quantity: row.quantity,
-          price: row.productPrice,
-        }));
-  
-        const response = await axiosClient.patch(`admin/orders/${id}`, {
-          orderDetails: newOrderDetails,
-        });
-  
-        if (response.status === 200) {
-          // Nếu cả hai đều thành công, hiển thị thông báo hoặc thực hiện các hành động khác tùy thuộc vào yêu cầu của bạn
-          toast.success("Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!");
-          setNewRows([]);
-          // Cập nhật triggerReload để tự động load lại giao diện
-          setTriggerReload(true);
+        if (newStatus !== "" || newRows.length > 0) { // Kiểm tra xem newStatus hoặc newRows có giá trị không rỗng
+            // Cập nhật trạng thái của đơn hàng
+            if (newStatus !== "") { // Kiểm tra xem newStatus có giá trị không rỗng
+                const statusResponse = await axiosClient.patch(`admin/orders/${id}/status`, {
+                    status: newStatus 
+                });
+                if (statusResponse.status !== 200) {
+                    throw new Error("Cập nhật trạng thái đơn hàng thất bại!");
+                }
+            }
+            // Thêm món ăn vào đơn hàng
+            if (newRows.length > 0) { // Kiểm tra xem newRows có phần tử không
+                const newOrderDetails = newRows.map((row) => ({
+                    productId: row.productId,
+                    quantity: row.quantity,
+                    price: row.productPrice,
+                }));
+                const response = await axiosClient.patch(`admin/orders/${id}`, {
+                    orderDetails: newOrderDetails,
+                });
+                if (response.status !== 200) {
+                    throw new Error("Thêm món ăn vào đơn hàng thất bại!");
+                }
+            }
+            // Nếu cả hai hoạt động đều thành công
+            toast.success("Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!");
+            setNewRows([]);
+            
+            // Tải lại trang sau khi cập nhật thành công
+            window.location.reload();
         } else {
-          // Nếu thêm món ăn không thành công, hiển thị thông báo lỗi hoặc xử lý lỗi tương ứng
-          toast.error("Thêm món ăn vào đơn hàng thất bại!");
+            // Nếu không có gì để cập nhật
+            toast.warning("Không có thay đổi để lưu!");
         }
-      } else {
-        // Nếu cập nhật trạng thái không thành công, hiển thị thông báo lỗi hoặc xử lý lỗi tương ứng
-        toast.error("Cập nhật trạng thái đơn hàng thất bại!");
-      }
     } catch (error) {
-      console.error(error);
-      // Xử lý lỗi nếu có
-      toast.error("Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!");
+        console.error(error);
+        toast.error("Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!");
     }
-  };
+};
+
+
+
 
   const handleStatusChange = (e, id, newStatus) => {
     const { value } = e.target;
@@ -208,7 +213,7 @@ const OrderDetails = () => {
       }
     };
     getOrderDetails();
-  }, [id, triggerReload]); // Thêm triggerReload vào dependency array
+  }, [id]);
 
   const getAllOrders = async () => {
     try {
@@ -231,6 +236,8 @@ const OrderDetails = () => {
     const year = date.getFullYear().toString().slice(0);
     return `${day}/${month}/${year}`;
   };
+
+  
 
  
   return (
