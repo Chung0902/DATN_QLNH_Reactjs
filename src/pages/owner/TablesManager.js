@@ -14,6 +14,13 @@ const TablesManager = () => {
  
   const [checkedItems, setCheckedItems] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [pageNumber, setPageNumber] = useState(0);
+  const tablesPerPage = 10;
+
+  const pageCount = Math.ceil(tables.length / tablesPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
 
  
      //search
@@ -205,7 +212,9 @@ const TablesManager = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tables && tables.map((p)=>(
+                  {tables && tables
+                  .slice(pageNumber * tablesPerPage, pageNumber * tablesPerPage + tablesPerPage)
+                  .map((p)=>(
                   <tr key={p._id}>
                     <td width="10">
                       <input type="checkbox" checked={checkedItems[p._id] || false}
@@ -252,6 +261,29 @@ const TablesManager = () => {
                   ))}
                 </tbody>
               </table>
+              <div className="pagination">
+                  <button
+                    onClick={() => setPageNumber(0)}
+                    disabled={pageNumber === 0}
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: pageCount }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setPageNumber(index)}
+                      className={pageNumber === index ? "active" : ""}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setPageNumber(pageCount - 1)}
+                    disabled={pageNumber === pageCount - 1}
+                  >
+                    Next
+                  </button>
+                </div>
             </div>
           </div>
         </div>

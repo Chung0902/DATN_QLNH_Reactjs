@@ -7,7 +7,7 @@ import "././orders/OrderManagement.css"
 const OrderManagement = () => {
   const [listorders, setListorders] = useState([]);
   const [status, setStatus] = useState("");
-  const [selected, setSelected] = useState(null);
+ 
   const [pageNumber, setPageNumber] = useState(0);
   const ordersPerPage = 10; // Số lượng đơn hàng mỗi trang
 

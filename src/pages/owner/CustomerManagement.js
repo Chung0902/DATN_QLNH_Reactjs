@@ -5,11 +5,17 @@ import axiosClient from '../../libraries/axiosClient';
 import { toast } from 'react-hot-toast';
 
 const CustomerManagement = () => {
-
   const [customers, setCustomer] = useState([]);
   const [checkedItems, setCheckedItems] = useState({});
   const [searchFirstName, setSearchFirstName] = useState('');
   const [searchLastName, setSearchLastName] = useState('');
+  const [pageNumber, setPageNumber] = useState(0);
+  const customersPerPage = 10;
+
+  const pageCount = Math.ceil(customers.length / customersPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
 
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
@@ -163,7 +169,9 @@ const CustomerManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {customers && customers.map((c) =>(
+                  {customers && customers
+                   .slice(pageNumber * customersPerPage, pageNumber * customersPerPage + customersPerPage)
+                  .map((c) =>(
                     <tr key={c._id}>
                       <td width="10">
                         <input type="checkbox" checked={checkedItems[c._id] || false}
@@ -210,6 +218,29 @@ const CustomerManagement = () => {
                   
                 </tbody>
               </table>
+              <div className="pagination">
+                  <button
+                    onClick={() => setPageNumber(0)}
+                    disabled={pageNumber === 0}
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: pageCount }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setPageNumber(index)}
+                      className={pageNumber === index ? "active" : ""}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setPageNumber(pageCount - 1)}
+                    disabled={pageNumber === pageCount - 1}
+                  >
+                    Next
+                  </button>
+                </div>
             </div>
           </div>
         </div>

@@ -21,6 +21,13 @@ const EmployeeManager = () => {
   const [checkedItems, setCheckedItems] = useState({});
   const [searchFirstName, setSearchFirstName] = useState('');
   const [searchLastName, setSearchLastName] = useState('');
+  const [pageNumber, setPageNumber] = useState(0);
+  const employeesPerPage = 10;
+
+  const pageCount = Math.ceil(employees.length / employeesPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
  
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
@@ -257,7 +264,9 @@ const EmployeeManager = () => {
                 </thead>
                 <tbody>
                   {employees &&
-                    employees.map((e) =>
+                    employees
+                    .slice(pageNumber * employeesPerPage, pageNumber * employeesPerPage + employeesPerPage)
+                    .map((e) =>
                       e.role !== 1 ? (
                         <tr key={e._id}>
                           <td width="10">
@@ -325,6 +334,29 @@ const EmployeeManager = () => {
                     )}
                 </tbody>
               </table>
+              <div className="pagination">
+                  <button
+                    onClick={() => setPageNumber(0)}
+                    disabled={pageNumber === 0}
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: pageCount }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setPageNumber(index)}
+                      className={pageNumber === index ? "active" : ""}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setPageNumber(pageCount - 1)}
+                    disabled={pageNumber === pageCount - 1}
+                  >
+                    Next
+                  </button>
+                </div>
             </div>
           </div>
         </div>
