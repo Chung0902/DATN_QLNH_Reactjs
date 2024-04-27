@@ -14,9 +14,10 @@ const AddOrders = () => {
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
-    setDiscount(value);
+    const discountValue = value === "" ? 0 : parseFloat(value); // Set default value to 0 if input is empty
+    setDiscount(discountValue);
     // Calculate the new total after applying the discount
-    const discountFactor = (100 - value) / 100;
+    const discountFactor = (100 - discountValue) / 100;
     setTotalAfterDiscount(subtotal * discountFactor);
   };
 
@@ -28,6 +29,18 @@ const AddOrders = () => {
   });
   return newSubtotal;
   };
+
+  useEffect(() => {
+    const newSubtotal = calculateSubtotal(newRows, discount);
+    setSubtotal(newSubtotal);
+    // Recalculate the total after discount if discount is applied
+    if (discount || discount === 0) { // Check if discount is 0 as well
+      const discountFactor = (100 - discount) / 100;
+      setTotalAfterDiscount(newSubtotal * discountFactor);
+    } else {
+      setTotalAfterDiscount(newSubtotal); // If discount is not applied, set total after discount to subtotal
+    }
+  }, [newRows, discount]);
 
   const getAllProducts = async () => {
     try {
@@ -105,15 +118,7 @@ const AddOrders = () => {
     const newSubtotal = calculateSubtotal(newRows, discount);
     setSubtotal(newSubtotal);
   };
-  useEffect(() => {
-    const newSubtotal = calculateSubtotal(newRows);
-    setSubtotal(newSubtotal);
-    // Recalculate the total after discount if discount is applied
-    if (discount) {
-      const discountFactor = (100 - discount) / 100;
-      setTotalAfterDiscount(newSubtotal * discountFactor);
-    }
-  }, [newRows, discount]);
+ 
 
   return (
     <main className="app-content">
