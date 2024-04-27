@@ -19,8 +19,8 @@ const EmployeeManager = () => {
   const [updateAddress, setUpdateAddress] = useState();
   const [auth, setAuth] = useAuth();
   const [checkedItems, setCheckedItems] = useState({});
-  const [searchFirstName, setSearchFirstName] = useState('');
-  const [searchLastName, setSearchLastName] = useState('');
+  const [searchFirstName, setSearchFirstName] = useState("");
+  const [searchLastName, setSearchLastName] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
   const employeesPerPage = 10;
 
@@ -28,22 +28,22 @@ const EmployeeManager = () => {
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
- 
+
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
-    const [firstName,...lastName] = inputValue.split(" ");
+    const [firstName, ...lastName] = inputValue.split(" ");
     setSearchFirstName(firstName || "");
     setSearchLastName(lastName.join(" ") || "");
   };
-     //search
+  //search
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosClient.get(`questions/employeeSearch?firstName=${searchFirstName}&lastName=${searchLastName}`);
+      const response = await axiosClient.get(
+        `questions/employeeSearch?firstName=${searchFirstName}&lastName=${searchLastName}`
+      );
       console.log(response.payload);
-      if (response?.payload)
-      setEmployees(response?.payload); // Cập nhật state products với kết quả tìm kiếm
-    
+      if (response?.payload) setEmployees(response?.payload); // Cập nhật state products với kết quả tìm kiếm
     } catch (error) {
       console.log(error);
     }
@@ -61,11 +61,11 @@ const EmployeeManager = () => {
   const handleSelectAll = (event) => {
     const isChecked = event.target.checked;
     const newCheckedItems = {};
-  
+
     employees.forEach((product) => {
       newCheckedItems[product._id] = isChecked;
     });
-  
+
     setCheckedItems(newCheckedItems);
   };
   //click nút ẩn sẽ ẩn đi
@@ -73,12 +73,14 @@ const EmployeeManager = () => {
     const selectedIds = Object.keys(checkedItems).filter(
       (itemId) => checkedItems[itemId]
     );
-  
+
     try {
       //await axiosClient.post(`admin/products/${selectedIds.join(',')}/delete`);
-      await axiosClient.post('admin/employees/delete', {selectedIds});
+      await axiosClient.post("admin/employees/delete", { selectedIds });
       setCheckedItems({});
-      setEmployees(employees.filter((employee) => !selectedIds.includes(employee._id)));
+      setEmployees(
+        employees.filter((employee) => !selectedIds.includes(employee._id))
+      );
       toast.success("Đã xóa món ăn");
     } catch (error) {
       console.error(error);
@@ -112,7 +114,6 @@ const EmployeeManager = () => {
 
   useEffect(() => {
     getAllEmployees();
-    
   }, []);
 
   const handleUpdate = async (e) => {
@@ -228,15 +229,30 @@ const EmployeeManager = () => {
                   </NavLink>
                 </div>
                 <div className="col-sm-2">
-                  <a className="btn btn-delete btn-sm" onClick={handleDeleteSelected}>
+                  <a
+                    className="btn btn-delete btn-sm"
+                    onClick={handleDeleteSelected}
+                  >
                     <i className="fas fa-trash-alt"></i> Xóa tất cả{" "}
                   </a>
                 </div>
                 <div className="col-sm-7">
-                  <form className="d-flex " role="search" onSubmit={handleSearch}>
-                    <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"   value={searchFirstName + " " + searchLastName}
-    onChange={handleInputChange} />
-                    <button className="btn btn-info" type="submit">Search</button>
+                  <form
+                    className="d-flex "
+                    role="search"
+                    onSubmit={handleSearch}
+                  >
+                    <input
+                      className="form-control me-2"
+                      type="search"
+                      placeholder="Search"
+                      aria-label="Search"
+                      value={searchFirstName + " " + searchLastName}
+                      onChange={handleInputChange}
+                    />
+                    <button className="btn btn-info" type="submit">
+                      Search
+                    </button>
                   </form>
                 </div>
               </div>
@@ -250,7 +266,11 @@ const EmployeeManager = () => {
                 <thead>
                   <tr>
                     <th width="10">
-                      <input type="checkbox" id="all" onChange={handleSelectAll}/>
+                      <input
+                        type="checkbox"
+                        id="all"
+                        onChange={handleSelectAll}
+                      />
                     </th>
                     <th>ID nhân viên</th>
                     <th width="150">Họ và tên</th>
@@ -265,98 +285,106 @@ const EmployeeManager = () => {
                 <tbody>
                   {employees &&
                     employees
-                    .slice(pageNumber * employeesPerPage, pageNumber * employeesPerPage + employeesPerPage)
-                    .map((e) =>
-                      e.role !== 1 ? (
-                        <tr key={e._id}>
-                          <td width="10">
-                            <input type="checkbox" checked={checkedItems[e._id] || false}
-  onChange={(event) => handleItemCheck(event, e._id)}/>
-                          </td>
-                          <td>{e._id}</td>
-                          <td>
-                            {e.firstName} {e.lastName}
-                          </td>
-                          <td>{e.address}</td>
-                          <td>{formatDate(e.birthday)}</td>
-                          <td>{e.sex}</td>
-                          <td>{e.phoneNumber}</td>
-                          <td>{e.role === 0 ? "Bán hàng" : "Giao hàng"}</td>
-                          <td className="table-td-center">
-                            <button
-                              className="btn btn-primary btn-sm trash"
-                              type="button"
-                              title="Xóa"
-                              onClick={() => {
-                                handleDelete(e._id);
-                              }}
-                            >
-                              <i className="fas fa-trash-alt"></i>
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                              data-bs-toggle="modal"
-                              data-bs-target="#exampleModal"
-                              data-bs-whatever="@mdo"
-                              onClick={() => {
-                                setVisible(true);
-                                setSelected(e);
-                                setUpdateFirstName(e.firstName);
-                                setUpdateLastName(e.lastName);
-                                setUpdatePhoneNumber(e.phoneNumber);
-                                setUpdateEmail(e.email);
-                                setUpdateAddress(e.address);
-                                setRole(e.role);
-                              }}
-                            >
-                              <i className="fas fa-edit"></i>
-                            </button>
-                            <UpdateEmployee
-                              handleSubmit={handleUpdate}
-                              firstName={updateFirstName}
-                              lastName={updateLastName}
-                              phoneNumber={updatePhoneNumber}
-                              email={updateEmail}
-                              address={updateAddress}
-                              setEmail={setUpdateEmail}
-                              setLastName={setUpdateLastName}
-                              setPhoneNumber={setUpdatePhoneNumber}
-                              setFirstName={setUpdateFirstName}
-                              setAddress={setUpdateAddress}
-                              handleRoleChange={handleRoleChange}
-                            />
-                          </td>
-                        </tr>
-                      ) : (
-                        ""
+                      .slice(
+                        pageNumber * employeesPerPage,
+                        pageNumber * employeesPerPage + employeesPerPage
                       )
-                    )}
+                      .map((e) =>
+                        e.role !== 1 ? (
+                          <tr key={e._id}>
+                            <td width="10">
+                              <input
+                                type="checkbox"
+                                checked={checkedItems[e._id] || false}
+                                onChange={(event) =>
+                                  handleItemCheck(event, e._id)
+                                }
+                              />
+                            </td>
+                            <td>{e._id}</td>
+                            <td>
+                              {e.firstName} {e.lastName}
+                            </td>
+                            <td>{e.address}</td>
+                            <td>{formatDate(e.birthday)}</td>
+                            <td>{e.sex}</td>
+                            <td>{e.phoneNumber}</td>
+                            <td>{e.role === 0 ? "Bán hàng" : "Giao hàng"}</td>
+                            <td className="table-td-center">
+                              <button
+                                className="btn btn-primary btn-sm trash"
+                                type="button"
+                                title="Xóa"
+                                onClick={() => {
+                                  handleDelete(e._id);
+                                }}
+                              >
+                                <i className="fas fa-trash-alt"></i>
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#exampleModal"
+                                data-bs-whatever="@mdo"
+                                onClick={() => {
+                                  setVisible(true);
+                                  setSelected(e);
+                                  setUpdateFirstName(e.firstName);
+                                  setUpdateLastName(e.lastName);
+                                  setUpdatePhoneNumber(e.phoneNumber);
+                                  setUpdateEmail(e.email);
+                                  setUpdateAddress(e.address);
+                                  setRole(e.role);
+                                }}
+                              >
+                                <i className="fas fa-edit"></i>
+                              </button>
+                              <UpdateEmployee
+                                handleSubmit={handleUpdate}
+                                firstName={updateFirstName}
+                                lastName={updateLastName}
+                                phoneNumber={updatePhoneNumber}
+                                email={updateEmail}
+                                address={updateAddress}
+                                setEmail={setUpdateEmail}
+                                setLastName={setUpdateLastName}
+                                setPhoneNumber={setUpdatePhoneNumber}
+                                setFirstName={setUpdateFirstName}
+                                setAddress={setUpdateAddress}
+                                handleRoleChange={handleRoleChange}
+                              />
+                            </td>
+                          </tr>
+                        ) : (
+                          ""
+                        )
+                      )}
                 </tbody>
               </table>
               <div className="pagination">
+                <button
+                  onClick={() => setPageNumber(0)}
+                  disabled={pageNumber === 0}
+                >
+                  Previous
+                </button>
+                {Array.from({ length: pageCount }).map((_, index) => (
                   <button
-                    onClick={() => setPageNumber(0)}
-                    disabled={pageNumber === 0}
+                    key={index}
+                    onClick={() => setPageNumber(index)}
+                    className={pageNumber === index ? "active" : ""}
                   >
-                    Previous
+                    {index + 1}
                   </button>
-                  {Array.from({ length: pageCount }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setPageNumber(index)}
-                      className={pageNumber === index ? "active" : ""}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setPageNumber(pageCount - 1)}
-                    disabled={pageNumber === pageCount - 1}
-                  >
-                    Next
-                  </button>
-                </div>
+                ))}
+                <button
+                  onClick={() => setPageNumber(pageCount - 1)}
+                  disabled={pageNumber === pageCount - 1}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         </div>

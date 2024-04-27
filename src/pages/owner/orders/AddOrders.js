@@ -11,30 +11,32 @@ const AddOrders = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
+  const [employees, setEmployees] = useState([]);
+  const [tables, setTables] = useState([]);
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
-    const discountValue = value === "" ? 0 : parseFloat(value); // Set default value to 0 if input is empty
+    const discountValue = value === "" ? 0 : parseFloat(value); 
     setDiscount(discountValue);
-    // Calculate the new total after applying the discount
     const discountFactor = (100 - discountValue) / 100;
     setTotalAfterDiscount(subtotal * discountFactor);
   };
 
-  
   const calculateSubtotal = (rows, discount) => {
     let newSubtotal = 0;
-  rows.forEach((row) => {
-    newSubtotal += row.productPrice * row.quantity * (1 - row.productDiscount / 100);
-  });
-  return newSubtotal;
+    rows.forEach((row) => {
+      newSubtotal +=
+        row.productPrice * row.quantity * (1 - row.productDiscount / 100);
+    });
+    return newSubtotal;
   };
 
   useEffect(() => {
     const newSubtotal = calculateSubtotal(newRows, discount);
     setSubtotal(newSubtotal);
     // Recalculate the total after discount if discount is applied
-    if (discount || discount === 0) { // Check if discount is 0 as well
+    if (discount || discount === 0) {
+      // Check if discount is 0 as well
       const discountFactor = (100 - discount) / 100;
       setTotalAfterDiscount(newSubtotal * discountFactor);
     } else {
@@ -57,6 +59,32 @@ const AddOrders = () => {
 
   useEffect(() => {
     getAllProducts();
+  }, []);
+
+  const getAllEmployees = async () => {
+    try {
+      const response = await axiosClient.get("admin/employees");
+      setEmployees(response.payload);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllEmployees();
+  }, []);
+
+  const getAllTable = async () => {
+    try {
+      const response = await axiosClient.get("admin/tables");
+      setTables(response.payload);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllTable();
   }, []);
 
   const handleAddNewItem = () => {
@@ -110,15 +138,14 @@ const AddOrders = () => {
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
-        const updatedRows = [...prevRows];
-        updatedRows.splice(index, 1);
-        // Return the updated rows without recalculating the subtotal here
-        return updatedRows;
-      });
+      const updatedRows = [...prevRows];
+      updatedRows.splice(index, 1);
+      // Return the updated rows without recalculating the subtotal here
+      return updatedRows;
+    });
     const newSubtotal = calculateSubtotal(newRows, discount);
     setSubtotal(newSubtotal);
   };
- 
 
   return (
     <main className="app-content">
@@ -146,17 +173,28 @@ const AddOrders = () => {
                     <div>
                       <label>Bàn</label>
                       <select>
-                        <option value="table1">Bàn 1</option>
-                        <option value="table2">Bàn 2</option>
-                        <option value="table3">Bàn 3</option>
+                        <option value="">-- Chọn bàn --</option>
+                        {tables &&
+                          tables.map((table) => (
+                            <option key={table._id} value={table._id}>
+                              {table.name}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     <div>
                       <label>Khách hàng</label>
                       <select>
-                        <option value="customer1">Apricot Hotel</option>
+                        <option value="">-- Chọn khách hàng --</option>
+                        {employees &&
+                          employees.map((employee) => (
+                            <option key={employee._id} value={employee._id}>
+                              {employee.firstName} {employee.lastName}
+                            </option>
+                          ))}
                       </select>
                     </div>
+
                     <div>
                       <button
                         type="button"
@@ -267,12 +305,7 @@ const AddOrders = () => {
                   <div className="invoice-totals">
                     <div>
                       <label>Tạm tính</label>
-                      <input
-                        type="text"
-                        required
-                        value={subtotal}
-                        readOnly
-                      />
+                      <input type="text" required value={subtotal} readOnly />
                     </div>
                     <div>
                       <label>Chiết khấu</label>
