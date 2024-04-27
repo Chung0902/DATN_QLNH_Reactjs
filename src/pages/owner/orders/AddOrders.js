@@ -10,23 +10,23 @@ const AddOrders = () => {
   const [newRows, setNewRows] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
     setDiscount(value);
-    // Only calculate the new subtotal when the discount changes
-    const newSubtotal = calculateSubtotal(newRows, value);
-    setSubtotal(newSubtotal);
+    // Calculate the new total after applying the discount
+    const discountFactor = (100 - value) / 100;
+    setTotalAfterDiscount(subtotal * discountFactor);
   };
 
   
   const calculateSubtotal = (rows, discount) => {
     let newSubtotal = 0;
-    rows.forEach((row) => {
-      newSubtotal += row.productPrice * row.quantity * (1 - row.productDiscount / 100);
-    });
-    const discountedSubtotal = newSubtotal * (1 - discount / 100);
-    return discountedSubtotal;
+  rows.forEach((row) => {
+    newSubtotal += row.productPrice * row.quantity * (1 - row.productDiscount / 100);
+  });
+  return newSubtotal;
   };
 
   const getAllProducts = async () => {
@@ -106,9 +106,13 @@ const AddOrders = () => {
     setSubtotal(newSubtotal);
   };
   useEffect(() => {
-    // Subtotal needs to be recalculated when newRows or discount changes
-    const newSubtotal = calculateSubtotal(newRows, discount);
+    const newSubtotal = calculateSubtotal(newRows);
     setSubtotal(newSubtotal);
+    // Recalculate the total after discount if discount is applied
+    if (discount) {
+      const discountFactor = (100 - discount) / 100;
+      setTotalAfterDiscount(newSubtotal * discountFactor);
+    }
   }, [newRows, discount]);
 
   return (
@@ -280,7 +284,7 @@ const AddOrders = () => {
                       <input
                         type="text"
                         required
-                        value={subtotal}
+                        value={totalAfterDiscount}
                         readOnly
                       />
                     </div>
