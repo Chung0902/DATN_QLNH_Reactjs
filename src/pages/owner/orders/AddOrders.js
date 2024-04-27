@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../../libraries/axiosClient";
 import { useNavigate } from "react-router-dom";
 import { FaPlusSquare } from "react-icons/fa";
+import { toast } from "react-hot-toast";
+
 
 const AddOrders = () => {
   const [products, setProducts] = useState([]);
@@ -11,8 +13,12 @@ const AddOrders = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
-  const [employees, setEmployees] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [tables, setTables] = useState([]);
+  const [discounts, setDiscounts] = useState();
+  const [orderDetails, setOrderDetails] = useState();
+  const [supplierId, setSupplierId] = useState();
+  const [tableId, setTableId] = useState();
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
@@ -61,17 +67,17 @@ const AddOrders = () => {
     getAllProducts();
   }, []);
 
-  const getAllEmployees = async () => {
+  const getAllCustomers = async () => {
     try {
-      const response = await axiosClient.get("admin/employees");
-      setEmployees(response.payload);
+      const response = await axiosClient.get("admin/customers");
+      setCustomers(response.payload);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    getAllEmployees();
+    getAllCustomers();
   }, []);
 
   const getAllTable = async () => {
@@ -147,6 +153,28 @@ const AddOrders = () => {
     setSubtotal(newSubtotal);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axiosClient.post("admin/tables", {
+        tableId,
+        supplierId,
+        discounts,
+        orderDetails
+      });
+      console.log(response.payload);
+      if (response?.payload) {
+        toast.success(response.message);
+        console.log(response.message);
+        setProducts([...tables, response.payload]); 
+        navigate("/main/tablesmanager");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong in input form");
+    }
+  };
+
   return (
     <main className="app-content">
       <div className="app-title">
@@ -167,7 +195,7 @@ const AddOrders = () => {
           <div className="tile">
             <h3 className="tile-title">Tạo mới món ăn</h3>
             <div className="tile-body">
-              <form className="row">
+              <form className="row" onSubmit={handleSubmit}>
                 <div className="invoice-container">
                   <div className="invoice-header">
                     <div>
@@ -201,10 +229,10 @@ const AddOrders = () => {
                       <label>Khách hàng</label>
                       <select>
                         <option value="">-- Chọn khách hàng --</option>
-                        {employees &&
-                          employees.map((employee) => (
-                            <option key={employee._id} value={employee._id}>
-                              {employee.firstName} {employee.lastName}
+                        {customers &&
+                          customers.map((customers) => (
+                            <option key={customers._id} value={customers._id}>
+                              {customers.firstName} {customers.lastName}
                             </option>
                           ))}
                       </select>
