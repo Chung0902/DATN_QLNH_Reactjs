@@ -21,7 +21,7 @@ import ChatOnline from "./pages/owner/ChatOnline/index"
 import TablesManager from './pages/owner/TablesManager';
 import AddTable from "./pages/owner/table/AddTable";
 import OrderDetails from './pages/owner/orders/OrderDetails';
-
+import AddOrders from "./pages/owner/orders/AddOrders";
 
 
 function App() {
@@ -40,6 +40,8 @@ function App() {
           <Route path="/main/productsmanager/addproducts" element={<AddProduct/>} />
           <Route path="/main/ordermanagement" element={<OrderManagement/>} />
           <Route path="/main/ordermanagement/orderdetails/:id" element={<OrderDetails/>} />
+          <Route path="/main/ordermanagement/addorders" element={<AddOrders/>} />
+
           <Route path="/main/revenuemanagement" element={<RevenueManagement/>} />
           <Route path="/main/chat" element={<ChatOnline/>} />
 

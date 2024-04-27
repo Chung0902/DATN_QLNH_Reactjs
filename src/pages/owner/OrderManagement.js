@@ -67,6 +67,23 @@ const OrderManagement = () => {
         <div className="col-md-12">
           <div className="tile">
             <div className="tile-body">
+            <div className="row element-button">
+                <div className="col-sm-2">
+                  <NavLink
+                    to="/main/ordermanagement/addorders"
+                    className="active1"
+                  >
+                    <a
+                      className="btn btn-add btn-sm"
+                      href="form-add-san-pham.html"
+                      title="Thêm"
+                    >
+                      <i className="fas fa-plus"></i>
+                      Tạo mới đơn hàng
+                    </a>
+                  </NavLink>
+                </div>
+              </div>
               <div className="tile-body">
                 <table
                   className="table table-hover table-bordered"
