@@ -1,9 +1,6 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axiosClient from "../../../libraries/axiosClient";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
 import { FaPlusSquare } from "react-icons/fa";
 
 const AddOrders = () => {
@@ -14,25 +11,23 @@ const AddOrders = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [discount, setDiscount] = useState(0);
 
-  // Hàm xử lý thay đổi khi nhập giá trị chiết khấu
-const handleDiscountChange = (e) => {
+  const handleDiscountChange = (e) => {
     const { value } = e.target;
     setDiscount(value);
-    const newSubtotal = calculateSubtotal(newRows, value); // Tính toán tổng tiền dựa trên giá trị chiết khấu mới
+    // Only calculate the new subtotal when the discount changes
+    const newSubtotal = calculateSubtotal(newRows, value);
     setSubtotal(newSubtotal);
   };
+
   
-  // Hàm tính tổng tiền dựa trên các hàng và giá trị chiết khấu mới
   const calculateSubtotal = (rows, discount) => {
     let newSubtotal = 0;
     rows.forEach((row) => {
-      newSubtotal +=
-        row.productPrice * row.quantity * (1 - row.productDiscount / 100);
+      newSubtotal += row.productPrice * row.quantity * (1 - row.productDiscount / 100);
     });
-    const discountedSubtotal = newSubtotal * (1 - discount / 100); // Tính toán tổng tiền sau chiết khấu
+    const discountedSubtotal = newSubtotal * (1 - discount / 100);
     return discountedSubtotal;
   };
-  
 
   const getAllProducts = async () => {
     try {
@@ -58,7 +53,7 @@ const handleDiscountChange = (e) => {
       {
         productName: "",
         productId: "",
-        quantity: 1, // Đặt số lượng mặc định là 1 khi thêm hàng mới
+        quantity: 1,
         productPrice: "",
         productDiscount: "",
         totalOrderDetailPrice: "",
@@ -66,10 +61,9 @@ const handleDiscountChange = (e) => {
     ]);
   };
 
-  // Hàm xử lý thay đổi khi chọn sản phẩm hoặc thay đổi số lượng
   const handleNewRowChange = (e, index, field) => {
     const { value } = e.target;
-    let updatedRows = [...newRows]; // Initialize updatedRows with newRows
+    let updatedRows = [...newRows];
 
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
@@ -82,15 +76,8 @@ const handleDiscountChange = (e) => {
           totalOrderDetailPrice:
             product.price *
             updatedRows[index]?.quantity *
-            (1 - product.discount / 100), // Tính tổng tiền cho hàng mới
+            (1 - product.discount / 100),
         };
-        // Cập nhật tổng tiền của đơn hàng
-        const newSubtotal =
-          subtotal +
-          product.price *
-            updatedRows[index]?.quantity *
-            (1 - product.discount / 100);
-        setSubtotal(newSubtotal);
       }
     } else if (field === "quantity") {
       updatedRows[index] = {
@@ -99,27 +86,30 @@ const handleDiscountChange = (e) => {
         totalOrderDetailPrice:
           updatedRows[index]?.productPrice *
           value *
-          (1 - updatedRows[index]?.productDiscount / 100), // Cập nhật tổng tiền khi số lượng thay đổi
+          (1 - updatedRows[index]?.productDiscount / 100),
       };
-      // Cập nhật tổng tiền của đơn hàng
-      const newSubtotal =
-        subtotal +
-        updatedRows[index]?.productPrice *
-          value *
-          (1 - updatedRows[index]?.productDiscount / 100);
-      setSubtotal(newSubtotal);
     }
 
-    setNewRows(updatedRows); // Update newRows with updatedRows
+    setNewRows(updatedRows);
+    const newSubtotal = calculateSubtotal(updatedRows, discount);
+    setSubtotal(newSubtotal);
   };
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
-      const updatedRows = [...prevRows];
-      updatedRows.splice(index, 1);
-      return updatedRows;
-    });
+        const updatedRows = [...prevRows];
+        updatedRows.splice(index, 1);
+        // Return the updated rows without recalculating the subtotal here
+        return updatedRows;
+      });
+    const newSubtotal = calculateSubtotal(newRows, discount);
+    setSubtotal(newSubtotal);
   };
+  useEffect(() => {
+    // Subtotal needs to be recalculated when newRows or discount changes
+    const newSubtotal = calculateSubtotal(newRows, discount);
+    setSubtotal(newSubtotal);
+  }, [newRows, discount]);
 
   return (
     <main className="app-content">
@@ -159,7 +149,6 @@ const handleDiscountChange = (e) => {
                       </select>
                     </div>
                     <div>
-                      {/* <span>Ngày tạo: 2020-03-04</span> */}
                       <button
                         type="button"
                         title="Thêm món ăn"
@@ -270,7 +259,6 @@ const handleDiscountChange = (e) => {
                     <div>
                       <label>Tạm tính</label>
                       <input
-                        // className="form-control"
                         type="text"
                         required
                         value={subtotal}
@@ -280,7 +268,6 @@ const handleDiscountChange = (e) => {
                     <div>
                       <label>Chiết khấu</label>
                       <input
-                        // className="form-control"
                         type="text"
                         required
                         value={discount}
@@ -291,7 +278,6 @@ const handleDiscountChange = (e) => {
                     <div>
                       <label>Thành tiền</label>
                       <input
-                        // className="form-control"
                         type="text"
                         required
                         value={subtotal}
