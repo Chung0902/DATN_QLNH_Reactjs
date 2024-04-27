@@ -16,7 +16,7 @@ const AddOrders = () => {
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
-    const discountValue = value === "" ? 0 : parseFloat(value); 
+    const discountValue = value === "" ? 0 : parseFloat(value);
     setDiscount(discountValue);
     const discountFactor = (100 - discountValue) / 100;
     setTotalAfterDiscount(subtotal * discountFactor);
@@ -173,15 +173,30 @@ const AddOrders = () => {
                     <div>
                       <label>Bàn</label>
                       <select>
+                        {/* Thêm một option mặc định */}
                         <option value="">-- Chọn bàn --</option>
+                        {/* Sử dụng map để render danh sách bàn */}
                         {tables &&
-                          tables.map((table) => (
-                            <option key={table._id} value={table._id}>
-                              {table.name}
-                            </option>
-                          ))}
+                          tables.map((table) => {
+                            // Kiểm tra trạng thái của bàn và chỉ hiển thị những bàn mà bạn muốn
+                            if (
+                              (table.status !== "Đã đặt" &&
+                                table.setup === "Có sẵn") ||
+                              (table.status !== "Đã đặt" &&
+                                table.setup === "Không có sẵn")
+                            ) {
+                              return (
+                                <option key={table.id} value={table.id}>
+                                  {table.name}
+                                </option>
+                              );
+                            } else {
+                              return null;
+                            }
+                          })}
                       </select>
                     </div>
+
                     <div>
                       <label>Khách hàng</label>
                       <select>
