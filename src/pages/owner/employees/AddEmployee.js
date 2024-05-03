@@ -201,7 +201,6 @@ const AddEmployee = () => {
                   >
                     <option>-- Chọn chức vụ --</option>
                     <option>Bán hàng</option>
-                    <option>Shipper</option>
                     <option>Chủ shop</option>
                   </select>
                 </div>

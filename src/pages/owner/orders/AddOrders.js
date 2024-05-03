@@ -3,9 +3,11 @@ import axiosClient from "../../../libraries/axiosClient";
 import { useNavigate } from "react-router-dom";
 import { FaPlusSquare } from "react-icons/fa";
 import { toast } from "react-hot-toast";
+import mongoose from "mongoose";
 
 
 const AddOrders = () => {
+  const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
   const [showNewRow, setShowNewRow] = useState(false);
@@ -15,10 +17,13 @@ const AddOrders = () => {
   const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
   const [customers, setCustomers] = useState([]);
   const [tables, setTables] = useState([]);
-  const [discounts, setDiscounts] = useState();
-  const [orderDetails, setOrderDetails] = useState();
-  const [supplierId, setSupplierId] = useState();
+  const [employees, setEmployees] = useState([]);
   const [tableId, setTableId] = useState();
+  const [customerId, setCustomerId] = useState();
+  const [productId, setProductId] = useState();
+  const [employeeId, setEmployeeId] = useState();
+  const [price, setPrice] = useState();
+  const [quantity, setQuantity] = useState();
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
@@ -32,7 +37,7 @@ const AddOrders = () => {
     let newSubtotal = 0;
     rows.forEach((row) => {
       newSubtotal +=
-        row.productPrice * row.quantity * (1 - row.productDiscount / 100);
+        row.price * row.quantity * (1 - row.productDiscount / 100);
     });
     return newSubtotal;
   };
@@ -40,13 +45,11 @@ const AddOrders = () => {
   useEffect(() => {
     const newSubtotal = calculateSubtotal(newRows, discount);
     setSubtotal(newSubtotal);
-    // Recalculate the total after discount if discount is applied
     if (discount || discount === 0) {
-      // Check if discount is 0 as well
       const discountFactor = (100 - discount) / 100;
       setTotalAfterDiscount(newSubtotal * discountFactor);
     } else {
-      setTotalAfterDiscount(newSubtotal); // If discount is not applied, set total after discount to subtotal
+      setTotalAfterDiscount(newSubtotal);
     }
   }, [newRows, discount]);
 
@@ -93,17 +96,28 @@ const AddOrders = () => {
     getAllTable();
   }, []);
 
+  const getAllEmployees = async () => {
+    try {
+      const response = await axiosClient.get("admin/employees");
+      setEmployees(response.payload);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllEmployees();
+  }, []);
+
   const handleAddNewItem = () => {
     setShowNewRow(true);
     setNewRows((prevRows) => [
       ...prevRows,
       {
-        productName: "",
-        productId: "",
+       productId: "",
         quantity: 1,
-        productPrice: "",
-        productDiscount: "",
-        totalOrderDetailPrice: "",
+        price: 0,
+        productDiscount: 0,
       },
     ]);
   };
@@ -118,7 +132,7 @@ const AddOrders = () => {
         updatedRows[index] = {
           ...updatedRows[index],
           [field]: value,
-          productPrice: product.price,
+          price: product.price,
           productDiscount: product.discount,
           totalOrderDetailPrice:
             product.price *
@@ -131,7 +145,7 @@ const AddOrders = () => {
         ...updatedRows[index],
         [field]: value,
         totalOrderDetailPrice:
-          updatedRows[index]?.productPrice *
+          updatedRows[index]?.price *
           value *
           (1 - updatedRows[index]?.productDiscount / 100),
       };
@@ -153,27 +167,62 @@ const AddOrders = () => {
     setSubtotal(newSubtotal);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axiosClient.post("admin/tables", {
-        tableId,
-        supplierId,
-        discounts,
-        orderDetails
-      });
-      console.log(response.payload);
-      if (response?.payload) {
-        toast.success(response.message);
-        console.log(response.message);
-        setProducts([...tables, response.payload]); 
-        navigate("/main/tablesmanager");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong in input form");
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     try {
+//       const response = await axiosClient.post("admin/orders", {
+//         customerId,
+//         employeeId,
+//         discount,
+//         orderDetails: [{
+//           productId,
+//           price,
+//           quantity,
+//         }]
+//         ,
+//         tableId
+//       });
+//       console.log(response?.payload);
+//       if (response?.payload) {
+//         toast.success("Order created successfully");
+//         console.log("Order created successfully");
+//         setOrders([...orders, response.payload]); 
+//         navigate("/main/ordermanagement");
+//       }
+//     } catch (error) {
+//       console.log(error);
+//       toast.error("Something went wrong in input form");
+//     }
+// };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axiosClient.post("admin/orders", {
+      customerId,
+      employeeId,
+      discount,
+      orderDetails: newRows.map((row) => ({
+        productId: row.productId,
+        quantity: row.quantity,
+        price: row.price,
+      })),
+      tableId
+    });
+    console.log(response?.payload);
+    if (response?.payload) {
+      toast.success("Tạo đơn hàng thành công");
+      console.log("Tạo đơn hàng thành công");
+      setOrders([...orders, response.payload]); 
+      navigate("/main/ordermanagement");
     }
-  };
+  } catch (error) {
+    console.log(error);
+    toast.error("Đã xảy ra lỗi khi nhập dữ liệu");
+  }
+};
+
+
 
   return (
     <main className="app-content">
@@ -193,20 +242,24 @@ const AddOrders = () => {
       <div className="row">
         <div className="col-md-12">
           <div className="tile">
-            <h3 className="tile-title">Tạo mới món ăn</h3>
+            <h3 className="tile-title">Tạo mới đơn hàng</h3>
             <div className="tile-body">
               <form className="row" onSubmit={handleSubmit}>
                 <div className="invoice-container">
                   <div className="invoice-header">
                     <div>
                       <label>Bàn</label>
-                      <select>
-                        {/* Thêm một option mặc định */}
+                      <select
+                        className="form-control"
+                        id="exampleSelect3"
+                        required
+                        onChange={(event) => {
+                          setTableId(event.target.value);
+                        }}
+                      >
                         <option value="">-- Chọn bàn --</option>
-                        {/* Sử dụng map để render danh sách bàn */}
                         {tables &&
-                          tables.map((table) => {
-                            // Kiểm tra trạng thái của bàn và chỉ hiển thị những bàn mà bạn muốn
+                          tables?.map((table) => {
                             if (
                               (table.status !== "Đã đặt" &&
                                 table.setup === "Có sẵn") ||
@@ -214,7 +267,7 @@ const AddOrders = () => {
                                 table.setup === "Không có sẵn")
                             ) {
                               return (
-                                <option key={table.id} value={table.id}>
+                                <option key={table._id} value={table._id}>
                                   {table.name}
                                 </option>
                               );
@@ -227,12 +280,40 @@ const AddOrders = () => {
 
                     <div>
                       <label>Khách hàng</label>
-                      <select>
+                      <select
+                        className="form-control"
+                        id="exampleSelect1"
+                        required
+                        onChange={(event) => {
+                          setCustomerId(event.target.value);
+                        }}
+                      >
                         <option value="">-- Chọn khách hàng --</option>
                         {customers &&
-                          customers.map((customers) => (
-                            <option key={customers._id} value={customers._id}>
-                              {customers.firstName} {customers.lastName}
+                          customers?.map((customer) => (
+                            <option key={customer._id} value={customer._id}>
+                              {customer.firstName} {customer.lastName}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label>Nhân viên</label>
+                      <select
+                        className="form-control"
+                        id="exampleSelect2"
+                        required
+                        onChange={(event) => {
+                          console.log("Selected employee ID:", event.target.value);
+                          setEmployeeId(event.target.value);
+                        }}
+                      >
+                        <option value="">-- Chọn nhân viên --</option>
+                        {employees &&
+                          employees?.map((employee) => (
+                            <option key={employee._id} value={employee._id}>
+                              {employee.firstName} {employee.lastName}
                             </option>
                           ))}
                       </select>
@@ -302,7 +383,7 @@ const AddOrders = () => {
                                   className="form-control"
                                   type="number"
                                   required
-                                  value={row.productPrice}
+                                  value={row.price}
                                   readOnly
                                 />
                               </td>
@@ -371,7 +452,7 @@ const AddOrders = () => {
                     </div>
                   </div>
                 </div>
-                <button className="btn btn-save" type="button">
+                <button className="btn btn-save" type="submit">
                   Lưu
                 </button>
                 <button
