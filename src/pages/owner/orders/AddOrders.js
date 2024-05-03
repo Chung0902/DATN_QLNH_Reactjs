@@ -3,7 +3,6 @@ import axiosClient from "../../../libraries/axiosClient";
 import { useNavigate } from "react-router-dom";
 import { FaPlusSquare } from "react-icons/fa";
 import { toast } from "react-hot-toast";
-import mongoose from "mongoose";
 
 
 const AddOrders = () => {
@@ -114,7 +113,7 @@ const AddOrders = () => {
     setNewRows((prevRows) => [
       ...prevRows,
       {
-       productId: "",
+        productId: "",
         quantity: 1,
         price: 0,
         productDiscount: 0,
@@ -124,105 +123,92 @@ const AddOrders = () => {
 
   const handleNewRowChange = (e, index, field) => {
     const { value } = e.target;
-    let updatedRows = [...newRows];
-
+    const updatedRows = [...newRows];
+  
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
       if (product) {
+        const totalOrderDetailPrice =
+          (product.price || 0) *
+          (updatedRows[index]?.quantity || 1) *
+          (1 - (product.discount || 0) / 100);
+  
         updatedRows[index] = {
           ...updatedRows[index],
           [field]: value,
-          price: product.price,
-          productDiscount: product.discount,
-          totalOrderDetailPrice:
-            product.price *
-            updatedRows[index]?.quantity *
-            (1 - product.discount / 100),
+          price: product.price || 0,
+          productDiscount: product.discount || 0,
+          totalOrderDetailPrice: totalOrderDetailPrice,
         };
       }
     } else if (field === "quantity") {
+      const maxQuantity = products.find(
+        (product) => product._id === updatedRows[index]?.productId
+      )?.stock;
+  
+      // Kiểm tra số lượng không nhỏ hơn 1 và không vượt quá số lượng trong kho
+      if (value < 1 || (maxQuantity && value > maxQuantity)) {
+        // Nếu số lượng không hợp lệ, không cập nhật vào state và thoát khỏi hàm
+        return;
+      }
+  
+      const totalOrderDetailPrice =
+        (updatedRows[index]?.price || 0) *
+        parseInt(value) *
+        (1 - (updatedRows[index]?.productDiscount || 0) / 100);
+  
       updatedRows[index] = {
         ...updatedRows[index],
-        [field]: value,
-        totalOrderDetailPrice:
-          updatedRows[index]?.price *
-          value *
-          (1 - updatedRows[index]?.productDiscount / 100),
+        [field]: parseInt(value),
+        totalOrderDetailPrice: totalOrderDetailPrice,
       };
     }
-
+  
     setNewRows(updatedRows);
     const newSubtotal = calculateSubtotal(updatedRows, discount);
     setSubtotal(newSubtotal);
   };
+  
+  
+  
+  
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
       const updatedRows = [...prevRows];
       updatedRows.splice(index, 1);
-      // Return the updated rows without recalculating the subtotal here
       return updatedRows;
     });
     const newSubtotal = calculateSubtotal(newRows, discount);
     setSubtotal(newSubtotal);
   };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await axiosClient.post("admin/orders", {
-//         customerId,
-//         employeeId,
-//         discount,
-//         orderDetails: [{
-//           productId,
-//           price,
-//           quantity,
-//         }]
-//         ,
-//         tableId
-//       });
-//       console.log(response?.payload);
-//       if (response?.payload) {
-//         toast.success("Order created successfully");
-//         console.log("Order created successfully");
-//         setOrders([...orders, response.payload]); 
-//         navigate("/main/ordermanagement");
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       toast.error("Something went wrong in input form");
-//     }
-// };
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await axiosClient.post("admin/orders", {
-      customerId,
-      employeeId,
-      discount,
-      orderDetails: newRows.map((row) => ({
-        productId: row.productId,
-        quantity: row.quantity,
-        price: row.price,
-      })),
-      tableId
-    });
-    console.log(response?.payload);
-    if (response?.payload) {
-      toast.success("Tạo đơn hàng thành công");
-      console.log("Tạo đơn hàng thành công");
-      setOrders([...orders, response.payload]); 
-      navigate("/main/ordermanagement");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axiosClient.post("admin/orders", {
+        customerId,
+        employeeId,
+        discount,
+        orderDetails: newRows.map((row) => ({
+          productId: row.productId,
+          quantity: row.quantity,
+          price: row.price,
+        })),
+        tableId
+      });
+      console.log(response?.payload);
+      if (response?.payload) {
+        toast.success("Tạo đơn hàng thành công");
+        console.log("Tạo đơn hàng thành công");
+        setOrders([...orders, response.payload]); 
+        navigate("/main/ordermanagement");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Đã xảy ra lỗi khi nhập dữ liệu");
     }
-  } catch (error) {
-    console.log(error);
-    toast.error("Đã xảy ra lỗi khi nhập dữ liệu");
-  }
-};
-
-
+  };
 
   return (
     <main className="app-content">
@@ -346,27 +332,36 @@ const handleSubmit = async (e) => {
                           newRows.map((row, index) => (
                             <tr key={index}>
                               <td>
-                                <select
-                                  className="form-control"
-                                  type="text"
-                                  required
-                                  value={row.productId}
-                                  onChange={(e) =>
-                                    handleNewRowChange(e, index, "productId")
-                                  }
-                                >
-                                  <option>-- Chọn món ăn --</option>
-                                  {products &&
-                                    products.map((product) => (
-                                      <option
-                                        key={product._id}
-                                        value={product._id}
-                                      >
-                                        {product.name}
-                                      </option>
-                                    ))}
-                                </select>
-                              </td>
+  <select
+    className="form-control"
+    type="text"
+    required
+    value={row.productId}
+    onChange={(e) =>
+      handleNewRowChange(e, index, "productId")
+    }
+  >
+    <option>-- Chọn món ăn --</option>
+    {products &&
+      products.map((product) => {
+        // Kiểm tra nếu số lượng trong kho của sản phẩm lớn hơn 0
+        if (product.stock > 0) {
+          return (
+            <option
+              key={product._id}
+              value={product._id}
+            >
+              {product.name}
+            </option>
+          );
+        } else {
+          // Nếu số lượng trong kho bằng 0, không hiển thị tên sản phẩm
+          return null;
+        }
+      })}
+  </select>
+</td>
+
                               <td>
                                 <input
                                   className="form-control"
