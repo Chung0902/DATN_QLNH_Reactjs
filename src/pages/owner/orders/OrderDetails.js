@@ -485,8 +485,21 @@ const OrderDetails = () => {
                               onChange={(e) => handleStatusChange(e, id)}
                               disabled={e.order.status === "CANCELED"}
                             >
-                              <option value="WAITING">WAITING</option>
-                              <option value="DELIVERING">DELIVERING</option>
+                              <option
+                                value="WAITING"
+                                disabled={
+                                  e.order.status === "DELIVERING" ||
+                                  e.order.status === "COMPLETED"
+                                }
+                              >
+                                WAITING
+                              </option>
+                              <option
+                                value="DELIVERING"
+                                disabled={e.order.status === "COMPLETED"}
+                              >
+                                DELIVERING
+                              </option>
                               <option value="COMPLETED">COMPLETED</option>
                               <option value="CANCELED">CANCELED</option>
                             </select>
