@@ -4,15 +4,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import "./OrderDetails.css";
 import { FaPlusSquare } from "react-icons/fa";
 import { toast } from "react-hot-toast";
-import ReactPaginate from "react-paginate";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
   const [orderDetails, setOrderDetails] = useState([]);
   const { id } = useParams(); // Lấy id từ đường dẫn
-  const [orders, setOrders] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [ustatus, setUStatus] = useState();
   const [udiscount, setUDiscount] = useState();
   const [uquantity, setUQuantity] = useState();
   const [orderDetailsId, setOrderDetailsId] = useState();
@@ -22,27 +18,7 @@ const OrderDetails = () => {
   const [newRows, setNewRows] = useState([]);
   const [products, setProducts] = useState([]);
   const [order, setOrder] = useState([]);
-  const [newStatus, setNewStatus] = useState(""); 
- 
-
-
-  // const handleDeleteOrderDetail = async (id) => {
-  //   try {
-  //     // Gọi API để xóa sản phẩm trong chi tiết đơn hàng
-  //     const response = await axiosClient.delete(`admin/orders/${id}`);
-  //     if (response.success) {
-  //       toast.success("Xóa sản phẩm thành công!");
-  //       // Sau khi xóa thành công, cập nhật lại danh sách chi tiết đơn hàng
-  //       // hoặc có thể làm các thay đổi khác tùy theo nhu cầu của bạn
-  //       setOrderDetails(orderDetails.filter(orderDetail => orderDetail._id !== id));
-  //     } else {
-  //       toast.error("Có lỗi xảy ra khi xóa sản phẩm!");
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error("Có lỗi xảy ra khi xóa sản phẩm!");
-  //   }
-  // };
+  const [newStatus, setNewStatus] = useState("");
 
   const getAllProducts = async () => {
     try {
@@ -123,70 +99,77 @@ const OrderDetails = () => {
 
   const handleSave = async () => {
     try {
-        if (newStatus !== "" || newRows.length > 0) { // Kiểm tra xem newStatus hoặc newRows có giá trị không rỗng
-            // Cập nhật trạng thái của đơn hàng
-            if (newStatus !== "") { // Kiểm tra xem newStatus có giá trị không rỗng
-                const statusResponse = await axiosClient.patch(`admin/orders/${id}/status`, {
-                    status: newStatus 
-                });
-                if (statusResponse.status !== 200) {
-                    throw new Error("Cập nhật trạng thái đơn hàng thất bại!");
-                }
+      if (newStatus !== "" || newRows.length > 0) {
+        // Kiểm tra xem newStatus hoặc newRows có giá trị không rỗng
+        // Cập nhật trạng thái của đơn hàng
+        if (newStatus !== "") {
+          // Kiểm tra xem newStatus có giá trị không rỗng
+          const statusResponse = await axiosClient.patch(
+            `admin/orders/${id}/status`,
+            {
+              status: newStatus,
             }
-            // Thêm món ăn vào đơn hàng
-            if (newRows.length > 0) { // Kiểm tra xem newRows có phần tử không
-                const newOrderDetails = newRows.map((row) => ({
-                    productId: row.productId,
-                    quantity: row.quantity,
-                    price: row.productPrice,
-                }));
-                const response = await axiosClient.patch(`admin/orders/${id}`, {
-                    orderDetails: newOrderDetails,
-                });
-                if (response.status !== 200) {
-                    throw new Error("Thêm món ăn vào đơn hàng thất bại!");
-                }
-            }
-            // Nếu cả hai hoạt động đều thành công
-            toast.success("Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!");
-            setNewRows([]);
-            
-            // Tải lại trang sau khi cập nhật thành công
-            window.location.reload();
-        } else {
-            // Nếu không có gì để cập nhật
-            toast.warning("Không có thay đổi để lưu!");
+          );
+          if (statusResponse.status !== 200) {
+            throw new Error("Cập nhật trạng thái đơn hàng thất bại!");
+          }
         }
+        // Thêm món ăn vào đơn hàng
+        if (newRows.length > 0) {
+          // Kiểm tra xem newRows có phần tử không
+          const newOrderDetails = newRows.map((row) => ({
+            productId: row.productId,
+            quantity: row.quantity,
+            price: row.productPrice,
+          }));
+          const response = await axiosClient.patch(`admin/orders/${id}`, {
+            orderDetails: newOrderDetails,
+          });
+          if (response.status !== 200) {
+            throw new Error("Thêm món ăn vào đơn hàng thất bại!");
+          }
+        }
+        // Nếu cả hai hoạt động đều thành công
+        toast.success(
+          "Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!"
+        );
+        setNewRows([]);
+
+        // Tải lại trang sau khi cập nhật thành công
+        window.location.reload();
+      } else {
+        // Nếu không có gì để cập nhật
+        toast.warning("Không có thay đổi để lưu!");
+      }
     } catch (error) {
-        console.error(error);
-        toast.error("Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!");
+      console.error(error);
+      toast.error(
+        "Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!"
+      );
     }
-};
-
-
-
-
-  const handleStatusChange = (e, id, newStatus) => {
-    const { value } = e.target;
-    setNewStatus(value);
-    setOrderDetails((prevDetails) => {
-      const updatedDetails = prevDetails.map((detail) => {
-        if (detail.order._id === id) {
-          return {
-            ...detail,
-            order: {
-              ...detail.order,
-              status: value, // Cập nhật trạng thái mới
-            },
-          };
-        }
-        return detail;
-      });
-      return updatedDetails;
-    });
   };
 
-  
+  const handleStatusChange = (e, id) => {
+    const { value } = e.target;
+    if (value !== "CANCELED") {
+      setNewStatus(value);
+      setOrderDetails((prevDetails) => {
+        const updatedDetails = prevDetails.map((detail) => {
+          if (detail.order._id === id) {
+            return {
+              ...detail,
+              order: {
+                ...detail.order,
+                status: value, // Cập nhật trạng thái mới
+              },
+            };
+          }
+          return detail;
+        });
+        return updatedDetails;
+      });
+    }
+  };
 
   const getOrders = async () => {
     try {
@@ -237,9 +220,6 @@ const OrderDetails = () => {
     return `${day}/${month}/${year}`;
   };
 
-  
-
- 
   return (
     <main className="app-content">
       <div className="app-title">
@@ -294,13 +274,16 @@ const OrderDetails = () => {
                             <span>
                               Ngày đặt: {formatDate(e.order.createdDate)}
                             </span>
-                            <button
-                              type="button"
-                              title="Thêm món ăn"
-                              onClick={handleAddNewItem}
-                            >
-                              <FaPlusSquare />
-                            </button>
+
+                            {e.order.status !== "CANCELED" && (
+                              <button
+                                type="button"
+                                title="Thêm món ăn"
+                                onClick={handleAddNewItem}
+                              >
+                                <FaPlusSquare />
+                              </button>
+                            )}
                           </div>
                         </div>
                         <div className="invoice-body">
@@ -499,7 +482,8 @@ const OrderDetails = () => {
                             <label>Trạng thái</label>
                             <select
                               value={e.order.status}
-                              onChange={(e) => handleStatusChange(e, id, newStatus)}
+                              onChange={(e) => handleStatusChange(e, id)}
+                              disabled={e.order.status === "CANCELED"}
                             >
                               <option value="WAITING">WAITING</option>
                               <option value="DELIVERING">DELIVERING</option>

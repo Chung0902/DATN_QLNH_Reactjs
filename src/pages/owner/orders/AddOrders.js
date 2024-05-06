@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { FaPlusSquare } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 
-
 const AddOrders = () => {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
@@ -35,8 +34,7 @@ const AddOrders = () => {
   const calculateSubtotal = (rows, discount) => {
     let newSubtotal = 0;
     rows.forEach((row) => {
-      newSubtotal +=
-        row.price * row.quantity * (1 - row.productDiscount / 100);
+      newSubtotal += row.price * row.quantity * (1 - row.productDiscount / 100);
     });
     return newSubtotal;
   };
@@ -124,7 +122,7 @@ const AddOrders = () => {
   const handleNewRowChange = (e, index, field) => {
     const { value } = e.target;
     const updatedRows = [...newRows];
-  
+
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
       if (product) {
@@ -132,7 +130,7 @@ const AddOrders = () => {
           (product.price || 0) *
           (updatedRows[index]?.quantity || 1) *
           (1 - (product.discount || 0) / 100);
-  
+
         updatedRows[index] = {
           ...updatedRows[index],
           [field]: value,
@@ -145,33 +143,29 @@ const AddOrders = () => {
       const maxQuantity = products.find(
         (product) => product._id === updatedRows[index]?.productId
       )?.stock;
-  
+
       // Kiểm tra số lượng không nhỏ hơn 1 và không vượt quá số lượng trong kho
       if (value < 1 || (maxQuantity && value > maxQuantity)) {
         // Nếu số lượng không hợp lệ, không cập nhật vào state và thoát khỏi hàm
         return;
       }
-  
+
       const totalOrderDetailPrice =
         (updatedRows[index]?.price || 0) *
         parseInt(value) *
         (1 - (updatedRows[index]?.productDiscount || 0) / 100);
-  
+
       updatedRows[index] = {
         ...updatedRows[index],
         [field]: parseInt(value),
         totalOrderDetailPrice: totalOrderDetailPrice,
       };
     }
-  
+
     setNewRows(updatedRows);
     const newSubtotal = calculateSubtotal(updatedRows, discount);
     setSubtotal(newSubtotal);
   };
-  
-  
-  
-  
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
@@ -195,13 +189,13 @@ const AddOrders = () => {
           quantity: row.quantity,
           price: row.price,
         })),
-        tableId
+        tableId,
       });
       console.log(response?.payload);
       if (response?.payload) {
         toast.success("Tạo đơn hàng thành công");
         console.log("Tạo đơn hàng thành công");
-        setOrders([...orders, response.payload]); 
+        setOrders([...orders, response.payload]);
         navigate("/main/ordermanagement");
       }
     } catch (error) {
@@ -291,7 +285,10 @@ const AddOrders = () => {
                         id="exampleSelect2"
                         required
                         onChange={(event) => {
-                          console.log("Selected employee ID:", event.target.value);
+                          console.log(
+                            "Selected employee ID:",
+                            event.target.value
+                          );
                           setEmployeeId(event.target.value);
                         }}
                       >
@@ -332,35 +329,35 @@ const AddOrders = () => {
                           newRows.map((row, index) => (
                             <tr key={index}>
                               <td>
-  <select
-    className="form-control"
-    type="text"
-    required
-    value={row.productId}
-    onChange={(e) =>
-      handleNewRowChange(e, index, "productId")
-    }
-  >
-    <option>-- Chọn món ăn --</option>
-    {products &&
-      products.map((product) => {
-        // Kiểm tra nếu số lượng trong kho của sản phẩm lớn hơn 0
-        if (product.stock > 0) {
-          return (
-            <option
-              key={product._id}
-              value={product._id}
-            >
-              {product.name}
-            </option>
-          );
-        } else {
-          // Nếu số lượng trong kho bằng 0, không hiển thị tên sản phẩm
-          return null;
-        }
-      })}
-  </select>
-</td>
+                                <select
+                                  className="form-control"
+                                  type="text"
+                                  required
+                                  value={row.productId}
+                                  onChange={(e) =>
+                                    handleNewRowChange(e, index, "productId")
+                                  }
+                                >
+                                  <option>-- Chọn món ăn --</option>
+                                  {products &&
+                                    products.map((product) => {
+                                      // Kiểm tra nếu số lượng trong kho của sản phẩm lớn hơn 0
+                                      if (product.stock > 0) {
+                                        return (
+                                          <option
+                                            key={product._id}
+                                            value={product._id}
+                                          >
+                                            {product.name}
+                                          </option>
+                                        );
+                                      } else {
+                                        // Nếu số lượng trong kho bằng 0, không hiển thị tên sản phẩm
+                                        return null;
+                                      }
+                                    })}
+                                </select>
+                              </td>
 
                               <td>
                                 <input
