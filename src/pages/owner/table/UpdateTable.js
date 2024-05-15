@@ -95,7 +95,10 @@ const UpdateTable = ({
 
             </div>
 
-            <button className="btn btn-save" type="submit">
+            <button 
+              className="btn btn-save" 
+              type="submit"
+            >
               Lưu lại
             </button>
             <button

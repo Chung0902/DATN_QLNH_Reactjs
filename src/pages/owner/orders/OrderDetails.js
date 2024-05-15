@@ -20,6 +20,8 @@ const OrderDetails = () => {
   const [order, setOrder] = useState([]);
   const [newStatus, setNewStatus] = useState("");
 
+  const [reloadPage, setReloadPage] = useState(false); // State để theo dõi thay đổi và reload trang
+
   const getAllProducts = async () => {
     try {
       const response = await axiosClient.get("admin/products");
@@ -53,51 +55,50 @@ const OrderDetails = () => {
   };
 
   // Hàm xử lý thay đổi khi chọn sản phẩm hoặc thay đổi số lượng
- const handleNewRowChange = (e, index, field) => {
-  const { value } = e.target;
-  const parsedValue = parseInt(value, 10);
-
-  setNewRows((prevRows) => {
-    const updatedRows = [...prevRows];
-
+  const handleNewRowChange = (e, index, field) => {
+    const { value } = e.target;
+    const parsedValue = parseInt(value, 10);
+  
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
       if (product) {
-        updatedRows[index] = {
-          ...updatedRows[index],
-          [field]: value,
-          productPrice: product.price,
-          productDiscount: product.discount,
-          totalOrderDetailPrice:
-            product.price *
-            updatedRows[index].quantity *
-            (1 - product.discount / 100), // Tính tổng tiền cho hàng mới
-        };
+        setNewRows((prevRows) => {
+          const updatedRows = [...prevRows];
+          updatedRows[index] = {
+            ...updatedRows[index],
+            [field]: value,
+            productPrice: product.price,
+            productDiscount: product.discount,
+            totalOrderDetailPrice:
+              product.price *
+              updatedRows[index].quantity *
+              (1 - product.discount / 100), // Tính tổng tiền cho hàng mới
+          };
+          return updatedRows;
+        });
       }
     } else if (field === "quantity") {
-      const productId = updatedRows[index].productId;
-      const product = products.find((product) => product._id === productId);
-      if (product) {
-        const newQuantity = Math.max(1, Math.min(parsedValue, product.stock));
-        updatedRows[index] = {
-          ...updatedRows[index],
-          [field]: newQuantity,
-          totalOrderDetailPrice:
-            updatedRows[index].productPrice *
-            newQuantity *
-            (1 - updatedRows[index].productDiscount / 100), // Cập nhật tổng tiền khi số lượng thay đổi
-        };
-      }
-    } else {
-      updatedRows[index] = {
-        ...updatedRows[index],
-        [field]: value,
-      };
+      setNewRows((prevRows) => {
+        const updatedRows = [...prevRows];
+        const currentRow = updatedRows[index];
+        const product = products.find((product) => product._id === currentRow.productId);
+        
+        if (product) {
+          const newQuantity = Math.max(1, Math.min(parsedValue, product.stock));
+          updatedRows[index] = {
+            ...currentRow,
+            [field]: newQuantity,
+            totalOrderDetailPrice:
+              currentRow.productPrice *
+              newQuantity *
+              (1 - currentRow.productDiscount / 100), // Cập nhật tổng tiền khi số lượng thay đổi
+          };
+        }
+        return updatedRows;
+      });
     }
-
-    return updatedRows;
-  });
-};
+  };
+  
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
@@ -145,12 +146,11 @@ const OrderDetails = () => {
         );
         setNewRows([]);
 
-        // Tải lại trang sau khi cập nhật thành công
-        window.location.reload();
       } else {
         // Nếu không có gì để cập nhật
         toast.warning("Không có thay đổi để lưu!");
       }
+      setReloadPage(true);
     } catch (error) {
       console.error(error);
       toast.error(
@@ -158,6 +158,13 @@ const OrderDetails = () => {
       );
     }
   };
+
+  useEffect(() => {
+    // Thực hiện reload trang khi reloadPage thay đổi
+    if (reloadPage) {
+      window.location.reload();
+    }
+  }, [reloadPage]);
 
   const handleStatusChange = (e, id) => {
     const { value } = e.target;

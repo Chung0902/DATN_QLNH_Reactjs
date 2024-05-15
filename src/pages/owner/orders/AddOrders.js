@@ -119,10 +119,58 @@ const AddOrders = () => {
     ]);
   };
 
+  // const handleNewRowChange = (e, index, field) => {
+  //   const { value } = e.target;
+  //   const updatedRows = [...newRows];
+
+  //   if (field === "productId") {
+  //     const product = products.find((product) => product._id === value);
+  //     if (product) {
+  //       const totalOrderDetailPrice =
+  //         (product.price || 0) *
+  //         (updatedRows[index]?.quantity || 1) *
+  //         (1 - (product.discount || 0) / 100);
+
+  //       updatedRows[index] = {
+  //         ...updatedRows[index],
+  //         [field]: value,
+  //         price: product.price || 0,
+  //         productDiscount: product.discount || 0,
+  //         totalOrderDetailPrice: totalOrderDetailPrice,
+  //       };
+  //     }
+  //   } else if (field === "quantity") {
+  //     const maxQuantity = products.find(
+  //       (product) => product._id === updatedRows[index]?.productId
+  //     )?.stock;
+
+  //     // Kiểm tra số lượng không nhỏ hơn 1 và không vượt quá số lượng trong kho
+  //     if (value < 1 || (maxQuantity && value > maxQuantity)) {
+  //       // Nếu số lượng không hợp lệ, không cập nhật vào state và thoát khỏi hàm
+  //       return;
+  //     }
+
+  //     const totalOrderDetailPrice =
+  //       (updatedRows[index]?.price || 0) *
+  //       parseInt(value) *
+  //       (1 - (updatedRows[index]?.productDiscount || 0) / 100);
+
+  //     updatedRows[index] = {
+  //       ...updatedRows[index],
+  //       [field]: parseInt(value),
+  //       totalOrderDetailPrice: totalOrderDetailPrice,
+  //     };
+  //   }
+
+  //   setNewRows(updatedRows);
+  //   const newSubtotal = calculateSubtotal(updatedRows, discount);
+  //   setSubtotal(newSubtotal);
+  // };
+
   const handleNewRowChange = (e, index, field) => {
     const { value } = e.target;
     const updatedRows = [...newRows];
-
+  
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
       if (product) {
@@ -130,7 +178,7 @@ const AddOrders = () => {
           (product.price || 0) *
           (updatedRows[index]?.quantity || 1) *
           (1 - (product.discount || 0) / 100);
-
+  
         updatedRows[index] = {
           ...updatedRows[index],
           [field]: value,
@@ -143,29 +191,29 @@ const AddOrders = () => {
       const maxQuantity = products.find(
         (product) => product._id === updatedRows[index]?.productId
       )?.stock;
-
-      // Kiểm tra số lượng không nhỏ hơn 1 và không vượt quá số lượng trong kho
-      if (value < 1 || (maxQuantity && value > maxQuantity)) {
-        // Nếu số lượng không hợp lệ, không cập nhật vào state và thoát khỏi hàm
-        return;
-      }
-
+  
+      const parsedQuantity = parseInt(value, 10);
+  
+      // Ensure quantity is not less than 1 and not greater than the available stock
+      const validQuantity = Math.max(1, Math.min(parsedQuantity, maxQuantity || parsedQuantity));
+  
       const totalOrderDetailPrice =
         (updatedRows[index]?.price || 0) *
-        parseInt(value) *
+        validQuantity *
         (1 - (updatedRows[index]?.productDiscount || 0) / 100);
-
+  
       updatedRows[index] = {
         ...updatedRows[index],
-        [field]: parseInt(value),
+        [field]: validQuantity,
         totalOrderDetailPrice: totalOrderDetailPrice,
       };
     }
-
+  
     setNewRows(updatedRows);
     const newSubtotal = calculateSubtotal(updatedRows, discount);
     setSubtotal(newSubtotal);
   };
+  
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {

@@ -123,12 +123,13 @@ const Login = () => {
                 <CCardBody className="text-center">
                   <div>
                     <h2>Nhà hàng hải sản</h2>
-                    {/* <p>
-                      When logging into the system of a website or application,
-                      the user will need to provide login information to
-                      authenticate his/her identity and access the system's
-                      features and services.
-                    </p> */}
+                    <p>
+                    Nhà hàng hải sản của chúng tôi là điểm đến lý tưởng cho 
+                    những ai đam mê hương vị tươi ngon từ biển cả. Với không 
+                    gian ấm cúng và đa dạng món ăn, chúng tôi tự hào mang đến 
+                    cho quý khách trải nghiệm ẩm thực độc đáo và đầy hấp dẫn. 
+                    Hãy đến và khám phá thế giới hải sản tươi ngon tại nhà hàng của chúng tôi!
+                    </p>
                     {/* <Link to="/register">
                       <CButton
                         color="primary"
