@@ -224,8 +224,14 @@ const EmployeeManager = () => {
                     to="/main/employeemanager/addemployee"
                     className="active1"
                   >
-                    <i className="fas fa-plus"></i>
-                    Tạo mới nhân viên
+                    <a
+                      className="btn btn-add btn-sm"
+                      href="form-add-san-pham.html"
+                      title="Thêm"
+                    >
+                      <i className="fas fa-plus"></i>
+                      Tạo mới nhân viên
+                    </a>
                   </NavLink>
                 </div>
                 <div className="col-sm-2">

@@ -53,41 +53,51 @@ const OrderDetails = () => {
   };
 
   // Hàm xử lý thay đổi khi chọn sản phẩm hoặc thay đổi số lượng
-  const handleNewRowChange = (e, index, field) => {
-    const { value } = e.target;
+ const handleNewRowChange = (e, index, field) => {
+  const { value } = e.target;
+  const parsedValue = parseInt(value, 10);
+
+  setNewRows((prevRows) => {
+    const updatedRows = [...prevRows];
+
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
       if (product) {
-        setNewRows((prevRows) => {
-          const updatedRows = [...prevRows];
-          updatedRows[index] = {
-            ...updatedRows[index],
-            [field]: value,
-            productPrice: product.price,
-            productDiscount: product.discount,
-            totalOrderDetailPrice:
-              product.price *
-              updatedRows[index].quantity *
-              (1 - product.discount / 100), // Tính tổng tiền cho hàng mới
-          };
-          return updatedRows;
-        });
-      }
-    } else if (field === "quantity") {
-      setNewRows((prevRows) => {
-        const updatedRows = [...prevRows];
         updatedRows[index] = {
           ...updatedRows[index],
           [field]: value,
+          productPrice: product.price,
+          productDiscount: product.discount,
+          totalOrderDetailPrice:
+            product.price *
+            updatedRows[index].quantity *
+            (1 - product.discount / 100), // Tính tổng tiền cho hàng mới
+        };
+      }
+    } else if (field === "quantity") {
+      const productId = updatedRows[index].productId;
+      const product = products.find((product) => product._id === productId);
+      if (product) {
+        const newQuantity = Math.max(1, Math.min(parsedValue, product.stock));
+        updatedRows[index] = {
+          ...updatedRows[index],
+          [field]: newQuantity,
           totalOrderDetailPrice:
             updatedRows[index].productPrice *
-            value *
+            newQuantity *
             (1 - updatedRows[index].productDiscount / 100), // Cập nhật tổng tiền khi số lượng thay đổi
         };
-        return updatedRows;
-      });
+      }
+    } else {
+      updatedRows[index] = {
+        ...updatedRows[index],
+        [field]: value,
+      };
     }
-  };
+
+    return updatedRows;
+  });
+};
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
@@ -151,24 +161,22 @@ const OrderDetails = () => {
 
   const handleStatusChange = (e, id) => {
     const { value } = e.target;
-    if (value !== "CANCELED") {
-      setNewStatus(value);
-      setOrderDetails((prevDetails) => {
-        const updatedDetails = prevDetails.map((detail) => {
-          if (detail.order._id === id) {
-            return {
-              ...detail,
-              order: {
-                ...detail.order,
-                status: value, // Cập nhật trạng thái mới
-              },
-            };
-          }
-          return detail;
-        });
-        return updatedDetails;
+    setNewStatus(value);
+    setOrderDetails((prevDetails) => {
+      const updatedDetails = prevDetails.map((detail) => {
+        if (detail.order._id === id) {
+          return {
+            ...detail,
+            order: {
+              ...detail.order,
+              status: value, // Cập nhật trạng thái mới
+            },
+          };
+        }
+        return detail;
       });
-    }
+      return updatedDetails;
+    });
   };
 
   const getOrders = async () => {
@@ -373,14 +381,22 @@ const OrderDetails = () => {
                                       >
                                         <option>-- Chọn món ăn --</option>
                                         {products &&
-                                          products.map((product) => (
-                                            <option
-                                              key={product._id}
-                                              value={product._id}
-                                            >
-                                              {product.name}
-                                            </option>
-                                          ))}
+                                          products.map((product) => {
+                                            // Kiểm tra nếu số lượng trong kho của sản phẩm lớn hơn 0
+                                            if (product.stock > 0) {
+                                              return (
+                                                <option
+                                                  key={product._id}
+                                                  value={product._id}
+                                                >
+                                                  {product.name}
+                                                </option>
+                                              );
+                                            } else {
+                                              // Nếu số lượng trong kho bằng 0, không hiển thị tên sản phẩm
+                                              return null;
+                                            }
+                                          })}
                                       </select>
                                     </td>
                                     <td>
@@ -500,8 +516,24 @@ const OrderDetails = () => {
                               >
                                 DELIVERING
                               </option>
-                              <option value="COMPLETED">COMPLETED</option>
-                              <option value="CANCELED">CANCELED</option>
+                              <option
+                                value="COMPLETED"
+                                disabled={
+                                  e.order.status === "WAITING" ||
+                                  e.order.status === "CANCELED"
+                                }
+                              >
+                                COMPLETED
+                              </option>
+                              <option
+                                value="CANCELED"
+                                disabled={
+                                  e.order.status === "DELIVERING" ||
+                                  e.order.status === "COMPLETED"
+                                }
+                              >
+                                CANCELED
+                              </option>
                             </select>
                           </div>
                         </div>

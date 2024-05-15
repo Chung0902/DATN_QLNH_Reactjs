@@ -123,12 +123,12 @@ const Login = () => {
                 <CCardBody className="text-center">
                   <div>
                     <h2>Nhà hàng hải sản</h2>
-                    <p>
+                    {/* <p>
                       When logging into the system of a website or application,
                       the user will need to provide login information to
                       authenticate his/her identity and access the system's
                       features and services.
-                    </p>
+                    </p> */}
                     {/* <Link to="/register">
                       <CButton
                         color="primary"
