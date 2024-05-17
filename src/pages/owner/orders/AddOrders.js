@@ -296,7 +296,7 @@ const AddOrders = () => {
                             ) {
                               return (
                                 <option key={table._id} value={table._id}>
-                                  {table.name}
+                                  {table.name} --- SL ghế: {table.numberOfSeats}
                                 </option>
                               );
                             } else {

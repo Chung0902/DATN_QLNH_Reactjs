@@ -37,6 +37,12 @@ const HeaderEm = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/main/tablesmanager" className="active1">
+              <span className="fas fa-table" />
+              <span>Tables</span>
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/main/ordermanagement" className="active1">
               <span className="fa-solid fa-truck-field-un" />
               <span>Oders</span>

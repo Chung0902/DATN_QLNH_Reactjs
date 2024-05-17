@@ -9,6 +9,7 @@ const AddTable = () => {
   const [numberOfSeats, setNumberOfSeats] = useState();
   const [setup, setSetup] = useState();
   const [status, setStatus] = useState();
+  const [photo, setPhoto] = useState();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,6 +20,7 @@ const AddTable = () => {
         numberOfSeats,
         setup,
         status,
+        photo,
       });
       if (response?.payload) {
         toast.success(response.message);
@@ -73,6 +75,16 @@ const AddTable = () => {
                     required
                     value={numberOfSeats}
                     onChange={(e) => setNumberOfSeats(e.target.value)}
+                  />
+                </div>
+                <div className="form-group  col-md-3">
+                  <label className="control-label">Image</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    required
+                    value={photo}
+                    onChange={(e) => setPhoto(e.target.value)}
                   />
                 </div>
                 <div className="form-group col-md-3">

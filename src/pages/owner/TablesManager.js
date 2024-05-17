@@ -10,6 +10,7 @@ const TablesManager = () => {
   const [unumberOfSeats,setUNumberOfSeats] = useState();
   const [usetup,setUSetup] = useState();
   const [ustatus,setUStatus] = useState();
+  const [uphoto,setUPhoto] = useState();
   const [selected, setSelected] = useState(null);
  
   const [checkedItems, setCheckedItems] = useState({});
@@ -83,7 +84,8 @@ const TablesManager = () => {
           name: uname,
           numberOfSeats: unumberOfSeats,
           setup: usetup,
-          status: ustatus
+          status: ustatus,
+          photo: uphoto,
         }
       );
       if (response.success) {
@@ -93,6 +95,7 @@ const TablesManager = () => {
         setUNumberOfSeats("");
         setUSetup("");
         setUStatus("");
+        setUPhoto("");
         setTables(
           tables.map((table) => {
             if (table._id === selected._id) {
@@ -102,6 +105,7 @@ const TablesManager = () => {
                 numberOfSeats: unumberOfSeats,
                 setup: usetup,
                 status: ustatus,
+                photo: uphoto,
               }; 
             }
             return table;
@@ -205,6 +209,7 @@ const TablesManager = () => {
                     </th>
                     <th>Mã bàn</th>
                     <th>Tên bàn</th>
+                    <th>Ảnh</th>
                     <th>Số lượng chỗ</th>
                     <th>Setup</th>
                     <th>Tình trạng</th>
@@ -222,6 +227,14 @@ const TablesManager = () => {
                     </td>
                     <td>{p._id}</td>
                     <td>{p.name}</td>
+                    <td>
+                      <img
+                        src={p.photo}
+                        alt=""
+                        width="100px;"
+                        height={"100px"}
+                      />
+                    </td>
                     <td>
                       {p.numberOfSeats}
                     </td>
@@ -248,6 +261,7 @@ const TablesManager = () => {
                         onClick={() => {
                           setSelected(p);
                           setUName(p.name);
+                          setUPhoto(p.photo);
                           setUNumberOfSeats(p.numberOfSeats);
                           setUSetup(p.setup);
                           setUStatus(p.status);
@@ -255,7 +269,7 @@ const TablesManager = () => {
                       >
                         <i className="fas fa-edit"></i>
                       </button>
-                      <UpdateTable handleSubmit={handleUpdate} name={uname} numberOfSeats={unumberOfSeats} setup={usetup} status={ustatus} setName={setUName} setNumberOfSeats={setUNumberOfSeats}  setSetup={setUSetup} setStatus={setUStatus}  />
+                      <UpdateTable handleSubmit={handleUpdate} name={uname} photo={uphoto} numberOfSeats={unumberOfSeats} setup={usetup} status={ustatus} setName={setUName} setPhoto={setUPhoto} setNumberOfSeats={setUNumberOfSeats}  setSetup={setUSetup} setStatus={setUStatus}  />
                     </td> 
                   </tr>
                   ))}
