@@ -7,7 +7,7 @@ const HeaderEm = () => {
       <div className="slidebar-brand">
         <h3>
           <span className="lab la-accusoft icon-logo" />{" "}
-          <b className="logo">Management System</b>{" "}
+          <b className="logo">HỆ THỐNG QUẢN LÝ</b>{" "}
         </h3>
       </div>
       <div className="slidebar-menu">
@@ -15,11 +15,11 @@ const HeaderEm = () => {
           <li>
             <NavLink to="/main/employeedashboard" className="active1">
               <span className="las la-igloo icon-logo" />
-              <span>Dashboard</span>
+              <span>Trang chủ</span>
             </NavLink>
           </li>
           <li className="menu">
-            <b>Account</b>
+            <b>Tài khoản</b>
           </li>
           <li>
             <NavLink to="/main/profilemanager" className="active1">
@@ -28,24 +28,24 @@ const HeaderEm = () => {
             </NavLink>
           </li>
           <li className="menu">
-            <b>Manager</b>
+            <b>QUẢN LÝ</b>
           </li>
           <li>
             <NavLink to="/main/customermanagement" className="active1">
               <span className="fa-solid fa-users" />
-              <span>Customers</span>
+              <span>Khách hàng</span>
             </NavLink>
           </li>
           <li>
             <NavLink to="/main/tablesmanager" className="active1">
               <span className="fas fa-table" />
-              <span>Tables</span>
+              <span>Bàn ăn</span>
             </NavLink>
           </li>
           <li>
             <NavLink to="/main/ordermanagement" className="active1">
               <span className="fa-solid fa-truck-field-un" />
-              <span>Oders</span>
+              <span>Đơn hàng</span>
             </NavLink>
           </li>
         </ul>
