@@ -683,6 +683,8 @@ fieldset:disabled a.btn {
   border-radius: .357rem;
   padding-right: 10px;
   font-weight: 500;
+  margin-right: 5px;
+  margin-top: 5px;
 }
 .btn-delete{
   background: rgb(218, 51, 51);

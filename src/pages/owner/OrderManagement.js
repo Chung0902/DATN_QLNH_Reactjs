@@ -50,6 +50,7 @@ const OrderManagement = () => {
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
+  
 
   return (
     <main className="app-content">
@@ -98,17 +99,7 @@ const OrderManagement = () => {
                       <th>SL món ăn</th>
                       <th>Tổng tiền</th>
                       <th>
-                        <select
-                          className="border-0 bg-secondary-subtle fw-semibold"
-                          value={status}
-                          onChange={(e) => setStatus(e.target.value)}
-                        >
-                          <option value="">Trạng thái</option>
-                          <option value="COMPLETED">COMPLETED</option>
-                          <option value="WAITING">WAITING</option>
-                          <option value="CANCELED">CANCELED</option>
-                          <option value="DELIVERING">DELIVERING</option>
-                        </select>
+                        Trạng thái
                       </th>
                       <th>Tính năng</th>
                     </tr>

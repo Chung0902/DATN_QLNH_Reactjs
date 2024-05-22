@@ -234,14 +234,14 @@ const EmployeeManager = () => {
                     </a>
                   </NavLink>
                 </div>
-                <div className="col-sm-2">
+                {/* <div className="col-sm-2">
                   <a
                     className="btn btn-delete btn-sm"
                     onClick={handleDeleteSelected}
                   >
                     <i className="fas fa-trash-alt"></i> Xóa tất cả{" "}
                   </a>
-                </div>
+                </div> */}
                 <div className="col-sm-7">
                   <form
                     className="d-flex "
@@ -271,13 +271,13 @@ const EmployeeManager = () => {
               >
                 <thead>
                   <tr>
-                    <th width="10">
+                    {/* <th width="10">
                       <input
                         type="checkbox"
                         id="all"
                         onChange={handleSelectAll}
                       />
-                    </th>
+                    </th> */}
                     <th>ID nhân viên</th>
                     <th width="150">Họ và tên</th>
                     <th width="300">Địa chỉ</th>
@@ -298,7 +298,7 @@ const EmployeeManager = () => {
                       .map((e) =>
                         e.role !== 1 ? (
                           <tr key={e._id}>
-                            <td width="10">
+                            {/* <td width="10">
                               <input
                                 type="checkbox"
                                 checked={checkedItems[e._id] || false}
@@ -306,7 +306,7 @@ const EmployeeManager = () => {
                                   handleItemCheck(event, e._id)
                                 }
                               />
-                            </td>
+                            </td> */}
                             <td>{e._id}</td>
                             <td>
                               {e.firstName} {e.lastName}
@@ -329,7 +329,7 @@ const EmployeeManager = () => {
                               </button>
                               <button
                                 type="button"
-                                className="btn btn-primary"
+                                className="btn btn-primary btn-sm edit"
                                 data-bs-toggle="modal"
                                 data-bs-target="#exampleModal"
                                 data-bs-whatever="@mdo"

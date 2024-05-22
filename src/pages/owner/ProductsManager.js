@@ -196,7 +196,7 @@ const ProductsManager = () => {
                     </a>
                   </NavLink>
                 </div>
-                <div className="col-sm-2">
+                {/* <div className="col-sm-2">
                   <a
                     className="btn btn-delete btn-sm"
                     type="button"
@@ -205,7 +205,7 @@ const ProductsManager = () => {
                   >
                     <i className="fas fa-trash-alt"></i> Xóa tất cả{" "}
                   </a>
-                </div>
+                </div> */}
                 <div className="col-sm-7">
                   <form className="d-flex " role="search" onSubmit={handleSearch}>
                     <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" value={searchTerm}

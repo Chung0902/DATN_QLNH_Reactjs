@@ -5,16 +5,16 @@ import { toast } from "react-hot-toast";
 import UpdateTable from "./table/UpdateTable";
 
 const TablesManager = () => {
-  const [tables,setTables] = useState([]);
-  const [uname,setUName] = useState();
-  const [unumberOfSeats,setUNumberOfSeats] = useState();
-  const [usetup,setUSetup] = useState();
-  const [ustatus,setUStatus] = useState();
-  const [uphoto,setUPhoto] = useState();
+  const [tables, setTables] = useState([]);
+  const [uname, setUName] = useState();
+  const [unumberOfSeats, setUNumberOfSeats] = useState();
+  const [usetup, setUSetup] = useState();
+  const [ustatus, setUStatus] = useState();
+  const [uphoto, setUPhoto] = useState();
   const [selected, setSelected] = useState(null);
- 
+
   const [checkedItems, setCheckedItems] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
   const tablesPerPage = 10;
 
@@ -23,16 +23,15 @@ const TablesManager = () => {
     setPageNumber(selected);
   };
 
- 
-     //search
+  //search
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosClient.get(`questions/productSearchb?name=${searchTerm}`);
+      const response = await axiosClient.get(
+        `questions/productSearchb?name=${searchTerm}`
+      );
       console.log(response.payload);
-      if (response?.payload)
-      setTables(response?.payload); 
-    
+      if (response?.payload) setTables(response?.payload);
     } catch (error) {
       console.log(error);
     }
@@ -51,11 +50,11 @@ const TablesManager = () => {
   const handleSelectAll = (event) => {
     const isChecked = event.target.checked;
     const newCheckedItems = {};
-  
+
     tables.forEach((table) => {
       newCheckedItems[table._id] = isChecked;
     });
-  
+
     setCheckedItems(newCheckedItems);
   };
   //click nút ẩn sẽ ẩn đi
@@ -63,9 +62,9 @@ const TablesManager = () => {
     const selectedIds = Object.keys(checkedItems).filter(
       (itemId) => checkedItems[itemId]
     );
-  
+
     try {
-      await axiosClient.post('admin/tables/delete', { selectedIds });
+      await axiosClient.post("admin/tables/delete", { selectedIds });
       setCheckedItems({});
       setTables(tables.filter((table) => !selectedIds.includes(table._id)));
       toast.success("Đã xóa bàn");
@@ -77,17 +76,13 @@ const TablesManager = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-    
-      const response = await axiosClient.patch(
-        `admin/tables/${selected._id}`,
-        {
-          name: uname,
-          numberOfSeats: unumberOfSeats,
-          setup: usetup,
-          status: ustatus,
-          photo: uphoto,
-        }
-      );
+      const response = await axiosClient.patch(`admin/tables/${selected._id}`, {
+        name: uname,
+        numberOfSeats: unumberOfSeats,
+        setup: usetup,
+        status: ustatus,
+        photo: uphoto,
+      });
       if (response.success) {
         toast.success(" is updated");
         setSelected(null);
@@ -106,7 +101,7 @@ const TablesManager = () => {
                 setup: usetup,
                 status: ustatus,
                 photo: uphoto,
-              }; 
+              };
             }
             return table;
           })
@@ -119,33 +114,30 @@ const TablesManager = () => {
     }
   };
 
-   //Delete tables
-   const handleDelete = async (pId) =>{
+  //Delete tables
+  const handleDelete = async (pId) => {
     try {
-        const response = await axiosClient.delete(`admin/tables/${pId}`);
-        if(response?.success){
-            toast.success(`tables is deleted`);
-            setTables(tables.filter((table) => table._id !== pId)); 
-            
-        }
-        
+      const response = await axiosClient.delete(`admin/tables/${pId}`);
+      if (response?.success) {
+        toast.success(`tables is deleted`);
+        setTables(tables.filter((table) => table._id !== pId));
+      }
     } catch (error) {
-        toast.error('Something went wrong')
+      toast.error("Something went wrong");
     }
-};
+  };
   const getAllTables = async () => {
     try {
-      const response = await axiosClient.get('admin/tables');
+      const response = await axiosClient.get("admin/tables");
       setTables(response.payload);
     } catch (error) {
       console.error(error);
     }
   };
 
-    useEffect(() =>{
-      getAllTables();
-    },[]);
-
+  useEffect(() => {
+    getAllTables();
+  }, []);
 
   return (
     <main className="app-content">
@@ -179,7 +171,7 @@ const TablesManager = () => {
                     </a>
                   </NavLink>
                 </div>
-                <div className="col-sm-2">
+                {/* <div className="col-sm-2">
                   <a
                     className="btn btn-delete btn-sm"
                     type="button"
@@ -188,15 +180,26 @@ const TablesManager = () => {
                   >
                     <i className="fas fa-trash-alt"></i> Xóa tất cả{" "}
                   </a>
-                </div>
+                </div> */}
                 <div className="col-sm-7">
-                  <form className="d-flex " role="search" onSubmit={handleSearch}>
-                    <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)} />
-                    <button className="btn btn-info" type="submit">Search</button>
+                  <form
+                    className="d-flex "
+                    role="search"
+                    onSubmit={handleSearch}
+                  >
+                    <input
+                      className="form-control me-2"
+                      type="search"
+                      placeholder="Search"
+                      aria-label="Search"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button className="btn btn-info" type="submit">
+                      Search
+                    </button>
                   </form>
                 </div>
-
               </div>
               <table
                 className="table table-hover table-bordered"
@@ -205,7 +208,11 @@ const TablesManager = () => {
                 <thead>
                   <tr>
                     <th width="10">
-                      <input type="checkbox" id="all" onChange={handleSelectAll}  />
+                      <input
+                        type="checkbox"
+                        id="all"
+                        onChange={handleSelectAll}
+                      />
                     </th>
                     <th>Mã bàn</th>
                     <th>Tên bàn</th>
@@ -217,87 +224,126 @@ const TablesManager = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tables && tables
-                  .slice(pageNumber * tablesPerPage, pageNumber * tablesPerPage + tablesPerPage)
-                  .map((p)=>(
-                  <tr key={p._id}>
-                    <td width="10">
-                      <input type="checkbox" checked={checkedItems[p._id] || false}
-  onChange={(e) => handleItemCheck(e, p._id)} />
-                    </td>
-                    <td>{p._id}</td>
-                    <td>{p.name}</td>
-                    <td>
-                      <img
-                        src={p.photo}
-                        alt=""
-                        width="100px;"
-                        height={"100px"}
-                      />
-                    </td>
-                    <td>
-                      {p.numberOfSeats}
-                    </td>
-                    <td><span className={`badge ${p.setup === 'Có sẵn' ? 'bg-success' : 'bg-warning'}`}>{p.setup}</span></td>
+                  {tables &&
+                    tables
+                      .slice(
+                        pageNumber * tablesPerPage,
+                        pageNumber * tablesPerPage + tablesPerPage
+                      )
+                      .map((p) => (
+                        <tr key={p._id}>
+                          <td width="10">
+                            <input
+                              type="checkbox"
+                              checked={checkedItems[p._id] || false}
+                              onChange={(e) => handleItemCheck(e, p._id)}
+                            />
+                          </td>
+                          <td>{p._id}</td>
+                          <td>{p.name}</td>
+                          <td>
+                            <img
+                              src={p.photo}
+                              alt=""
+                              width="100px;"
+                              height={"100px"}
+                            />
+                          </td>
+                          <td>{p.numberOfSeats}</td>
+                          <td>
+                            <span
+                              className={`badge ${
+                                p.setup === "Có sẵn"
+                                  ? "bg-success"
+                                  : "bg-warning"
+                              }`}
+                            >
+                              {p.setup}
+                            </span>
+                          </td>
 
-                    <td><span className={`badge ${p.status === 'Đang trống' ? 'bg-success' : 'bg-warning'}`}>{p.status}</span></td>
+                          <td>
+                            <span
+                              className={`badge ${
+                                p.status === "Đang trống"
+                                  ? "bg-success"
+                                  : "bg-warning"
+                              }`}
+                            >
+                              {p.status}
+                            </span>
+                          </td>
 
-                    <td>
-                      <button
-                        className="btn btn-primary btn-sm trash"
-                        type="button"
-                        title="Xóa"
-                        onClick={() => { handleDelete(p._id)}}
-                      >
-                        <i className="fas fa-trash-alt"></i>
-                      </button>
-                      <button
-                        className="btn btn-primary btn-sm edit"
-                        type="button"
-                        title="Sửa"
-                        id="show-emp"
-                        data-bs-toggle="modal"
-                        data-bs-target="#ModalUP"
-                        onClick={() => {
-                          setSelected(p);
-                          setUName(p.name);
-                          setUPhoto(p.photo);
-                          setUNumberOfSeats(p.numberOfSeats);
-                          setUSetup(p.setup);
-                          setUStatus(p.status);
-                        }}
-                      >
-                        <i className="fas fa-edit"></i>
-                      </button>
-                      <UpdateTable handleSubmit={handleUpdate} name={uname} photo={uphoto} numberOfSeats={unumberOfSeats} setup={usetup} status={ustatus} setName={setUName} setPhoto={setUPhoto} setNumberOfSeats={setUNumberOfSeats}  setSetup={setUSetup} setStatus={setUStatus}  />
-                    </td> 
-                  </tr>
-                  ))}
+                          <td>
+                            <button
+                              className="btn btn-primary btn-sm trash"
+                              type="button"
+                              title="Xóa"
+                              onClick={() => {
+                                handleDelete(p._id);
+                              }}
+                            >
+                              <i className="fas fa-trash-alt"></i>
+                            </button>
+                            <button
+                              className="btn btn-primary btn-sm edit"
+                              type="button"
+                              title="Sửa"
+                              id="show-emp"
+                              data-bs-toggle="modal"
+                              data-bs-target="#ModalUP"
+                              onClick={() => {
+                                setSelected(p);
+                                setUName(p.name);
+                                setUPhoto(p.photo);
+                                setUNumberOfSeats(p.numberOfSeats);
+                                setUSetup(p.setup);
+                                setUStatus(p.status);
+                              }}
+                            >
+                              <i className="fas fa-edit"></i>
+                            </button>
+                            <UpdateTable
+                              handleSubmit={handleUpdate}
+                              name={uname}
+                              photo={uphoto}
+                              numberOfSeats={unumberOfSeats}
+                              setup={usetup}
+                              status={ustatus}
+                              setName={setUName}
+                              setPhoto={setUPhoto}
+                              setNumberOfSeats={setUNumberOfSeats}
+                              setSetup={setUSetup}
+                              setStatus={setUStatus}
+                            />
+                          </td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
               <div className="pagination">
+                <button
+                  onClick={() => setPageNumber(0)}
+                  disabled={pageNumber === 0}
+                >
+                  Previous
+                </button>
+                {Array.from({ length: pageCount }).map((_, index) => (
                   <button
-                    onClick={() => setPageNumber(0)}
-                    disabled={pageNumber === 0}
+                    key={index}
+                    onClick={() => setPageNumber(index)}
+                    className={pageNumber === index ? "active" : ""}
                   >
-                    Previous
+                    {index + 1}
                   </button>
-                  {Array.from({ length: pageCount }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setPageNumber(index)}
-                      className={pageNumber === index ? "active" : ""}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setPageNumber(pageCount - 1)}
-                    disabled={pageNumber === pageCount - 1}
-                  >
-                    Next
-                  </button>
-                </div>
+                ))}
+                <button
+                  onClick={() => setPageNumber(pageCount - 1)}
+                  disabled={pageNumber === pageCount - 1}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         </div>
