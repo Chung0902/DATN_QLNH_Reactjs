@@ -20,7 +20,6 @@ const OrderDetails = () => {
   const [order, setOrder] = useState([]);
   const [newStatus, setNewStatus] = useState("");
 
-  const [reloadPage, setReloadPage] = useState(false); // State để theo dõi thay đổi và reload trang
 
   const getAllProducts = async () => {
     try {
@@ -110,61 +109,56 @@ const OrderDetails = () => {
 
   const handleSave = async () => {
     try {
-      if (newStatus !== "" || newRows.length > 0) {
-        // Kiểm tra xem newStatus hoặc newRows có giá trị không rỗng
+      let statusUpdated = false;
+      let itemsAdded = false;
+  
+      if (newStatus !== "") {
         // Cập nhật trạng thái của đơn hàng
-        if (newStatus !== "") {
-          // Kiểm tra xem newStatus có giá trị không rỗng
-          const statusResponse = await axiosClient.patch(
-            `admin/orders/${id}/status`,
-            {
-              status: newStatus,
-            }
-          );
-          if (statusResponse.status !== 200) {
-            throw new Error("Cập nhật trạng thái đơn hàng thất bại!");
-          }
-        }
+        await axiosClient.patch(`admin/orders/${id}/status`, {
+          status: newStatus,
+        });
+        statusUpdated = true;
+      }
+  
+      if (newRows.length > 0) {
         // Thêm món ăn vào đơn hàng
-        if (newRows.length > 0) {
-          // Kiểm tra xem newRows có phần tử không
-          const newOrderDetails = newRows.map((row) => ({
-            productId: row.productId,
-            quantity: row.quantity,
-            price: row.productPrice,
-          }));
-          const response = await axiosClient.patch(`admin/orders/${id}`, {
-            orderDetails: newOrderDetails,
-          });
-          if (response.status !== 200) {
-            throw new Error("Thêm món ăn vào đơn hàng thất bại!");
-          }
+        const newOrderDetails = newRows.map((row) => ({
+          productId: row.productId,
+          quantity: row.quantity,
+          price: row.productPrice,
+          discount: row.productDiscount // Thêm thông tin giảm giá
+        }));
+        await axiosClient.patch(`admin/orders/${id}`, {
+          orderDetails: newOrderDetails,
+        });
+        itemsAdded = true;
+      }
+  
+      if (statusUpdated || itemsAdded) {
+        // Nếu ít nhất một trong hai hoạt động đều thành công
+        let successMessage = "";
+        if (statusUpdated && itemsAdded) {
+          successMessage = "Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!";
+        } else if (statusUpdated) {
+          successMessage = "Cập nhật trạng thái đơn hàng thành công!";
+        } else {
+          successMessage = "Thêm món ăn vào đơn hàng thành công!";
         }
-        // Nếu cả hai hoạt động đều thành công
-        toast.success(
-          "Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!"
-        );
+        alert(successMessage);
+        setNewStatus("");
         setNewRows([]);
-
+        window.location.reload();
       } else {
         // Nếu không có gì để cập nhật
-        toast.warning("Không có thay đổi để lưu!");
+        alert("Không có thay đổi để lưu!");
       }
-      setReloadPage(true);
     } catch (error) {
       console.error(error);
-      toast.error(
-        "Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!"
-      );
+      alert("Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!");
     }
   };
-
-  useEffect(() => {
-    // Thực hiện reload trang khi reloadPage thay đổi
-    if (reloadPage) {
-      window.location.reload();
-    }
-  }, [reloadPage]);
+  
+  
 
   const handleStatusChange = (e, id) => {
     const { value } = e.target;
@@ -199,17 +193,18 @@ const OrderDetails = () => {
     getOrders();
   }, []);
 
+  const getOrderDetails = async () => {
+    try {
+      const response = await axiosClient.get(
+        `questions/listorders1?id=${id}`
+      );
+      setOrderDetails(response.payload);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const getOrderDetails = async () => {
-      try {
-        const response = await axiosClient.get(
-          `questions/listorders1?id=${id}`
-        );
-        setOrderDetails(response.payload);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     getOrderDetails();
   }, [id]);
 
