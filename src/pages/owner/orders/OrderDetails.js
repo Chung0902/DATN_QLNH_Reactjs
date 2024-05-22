@@ -20,7 +20,6 @@ const OrderDetails = () => {
   const [order, setOrder] = useState([]);
   const [newStatus, setNewStatus] = useState("");
 
-
   const getAllProducts = async () => {
     try {
       const response = await axiosClient.get("admin/products");
@@ -57,7 +56,7 @@ const OrderDetails = () => {
   const handleNewRowChange = (e, index, field) => {
     const { value } = e.target;
     const parsedValue = parseInt(value, 10);
-  
+
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
       if (product) {
@@ -80,8 +79,10 @@ const OrderDetails = () => {
       setNewRows((prevRows) => {
         const updatedRows = [...prevRows];
         const currentRow = updatedRows[index];
-        const product = products.find((product) => product._id === currentRow.productId);
-        
+        const product = products.find(
+          (product) => product._id === currentRow.productId
+        );
+
         if (product) {
           const newQuantity = Math.max(1, Math.min(parsedValue, product.stock));
           updatedRows[index] = {
@@ -97,7 +98,6 @@ const OrderDetails = () => {
       });
     }
   };
-  
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
@@ -111,7 +111,7 @@ const OrderDetails = () => {
     try {
       let statusUpdated = false;
       let itemsAdded = false;
-  
+
       if (newStatus !== "") {
         // Cập nhật trạng thái của đơn hàng
         await axiosClient.patch(`admin/orders/${id}/status`, {
@@ -119,26 +119,27 @@ const OrderDetails = () => {
         });
         statusUpdated = true;
       }
-  
+
       if (newRows.length > 0) {
         // Thêm món ăn vào đơn hàng
         const newOrderDetails = newRows.map((row) => ({
           productId: row.productId,
           quantity: row.quantity,
           price: row.productPrice,
-          discount: row.productDiscount // Thêm thông tin giảm giá
+          discount: row.productDiscount, // Thêm thông tin giảm giá
         }));
         await axiosClient.patch(`admin/orders/${id}`, {
           orderDetails: newOrderDetails,
         });
         itemsAdded = true;
       }
-  
+
       if (statusUpdated || itemsAdded) {
         // Nếu ít nhất một trong hai hoạt động đều thành công
         let successMessage = "";
         if (statusUpdated && itemsAdded) {
-          successMessage = "Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!";
+          successMessage =
+            "Cập nhật trạng thái và thêm món ăn vào đơn hàng thành công!";
         } else if (statusUpdated) {
           successMessage = "Cập nhật trạng thái đơn hàng thành công!";
         } else {
@@ -154,11 +155,11 @@ const OrderDetails = () => {
       }
     } catch (error) {
       console.error(error);
-      alert("Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!");
+      alert(
+        "Đã xảy ra lỗi khi cập nhật trạng thái và thêm món ăn vào đơn hàng!"
+      );
     }
   };
-  
-  
 
   const handleStatusChange = (e, id) => {
     const { value } = e.target;
@@ -195,9 +196,7 @@ const OrderDetails = () => {
 
   const getOrderDetails = async () => {
     try {
-      const response = await axiosClient.get(
-        `questions/listorders1?id=${id}`
-      );
+      const response = await axiosClient.get(`questions/listorders1?id=${id}`);
       setOrderDetails(response.payload);
     } catch (error) {
       console.error(error);
@@ -220,6 +219,19 @@ const OrderDetails = () => {
   useEffect(() => {
     getAllOrders();
   }, []);
+
+  // Thêm hàm tính tổng tiền sau khi áp dụng giảm giá cho mỗi mặt hàng
+  const calculateTotalAmountDiscount = (orderDetails) => {
+    let totalAmount = 0;
+    orderDetails.forEach((orderDetail) => {
+      const discountedPrice =
+        orderDetail.productPrice *
+        orderDetail.quantity *
+        (1 - orderDetail.productDiscount / 100);
+      totalAmount += discountedPrice;
+    });
+    return totalAmount;
+  };
 
   // Hàm biến đổi định dạng ngày
   const formatDate = (dateString) => {
@@ -358,7 +370,11 @@ const OrderDetails = () => {
                                       className="form-control"
                                       type="text"
                                       required
-                                      value={orderDetail.totalOrderDetailPrice}
+                                      value={
+                                        orderDetail.productPrice *
+                                        orderDetail.quantity *
+                                        (1 - orderDetail.productDiscount / 100)
+                                      }
                                       readOnly
                                     />
                                   </td>
@@ -470,10 +486,12 @@ const OrderDetails = () => {
                           <div>
                             <label>Tạm tính</label>
                             <input
-                              // className="form-control"
                               type="text"
                               required
-                              value={e.totalOrder}
+                              value={calculateTotalAmountDiscount(
+                                e.orderDetails
+                              )}
+                              readOnly
                             />
                           </div>
                           <div>
@@ -490,10 +508,20 @@ const OrderDetails = () => {
                           <div>
                             <label>Thành tiền</label>
                             <input
-                              // className="form-control"
                               type="text"
                               required
-                              value={e.totalamountdiscount}
+                              value={
+                                e.orderDetails.reduce(
+                                  (total, orderDetail) =>
+                                    total +
+                                    orderDetail.productPrice *
+                                      orderDetail.quantity *
+                                      (1 - orderDetail.productDiscount / 100),
+                                  0
+                                ) *
+                                (1 - e.order.discount / 100)
+                              }
+                              readOnly
                             />
                           </div>
                           <div>
