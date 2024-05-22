@@ -170,7 +170,7 @@ const AddOrders = () => {
   const handleNewRowChange = (e, index, field) => {
     const { value } = e.target;
     const updatedRows = [...newRows];
-  
+
     if (field === "productId") {
       const product = products.find((product) => product._id === value);
       if (product) {
@@ -178,7 +178,7 @@ const AddOrders = () => {
           (product.price || 0) *
           (updatedRows[index]?.quantity || 1) *
           (1 - (product.discount || 0) / 100);
-  
+
         updatedRows[index] = {
           ...updatedRows[index],
           [field]: value,
@@ -191,29 +191,31 @@ const AddOrders = () => {
       const maxQuantity = products.find(
         (product) => product._id === updatedRows[index]?.productId
       )?.stock;
-  
+
       const parsedQuantity = parseInt(value, 10);
-  
+
       // Ensure quantity is not less than 1 and not greater than the available stock
-      const validQuantity = Math.max(1, Math.min(parsedQuantity, maxQuantity || parsedQuantity));
-  
+      const validQuantity = Math.max(
+        1,
+        Math.min(parsedQuantity, maxQuantity || parsedQuantity)
+      );
+
       const totalOrderDetailPrice =
         (updatedRows[index]?.price || 0) *
         validQuantity *
         (1 - (updatedRows[index]?.productDiscount || 0) / 100);
-  
+
       updatedRows[index] = {
         ...updatedRows[index],
         [field]: validQuantity,
         totalOrderDetailPrice: totalOrderDetailPrice,
       };
     }
-  
+
     setNewRows(updatedRows);
     const newSubtotal = calculateSubtotal(updatedRows, discount);
     setSubtotal(newSubtotal);
   };
-  
 
   const handleDeleteNewRow = (index) => {
     setNewRows((prevRows) => {
@@ -245,6 +247,10 @@ const AddOrders = () => {
         console.log("Tạo đơn hàng thành công");
         setOrders([...orders, response.payload]);
         navigate("/main/ordermanagement");
+
+        // Tính toán lại tổng tiền sau khi lưu thành công
+        const newSubtotal = calculateSubtotal(newRows, discount);
+        setSubtotal(newSubtotal);
       }
     } catch (error) {
       console.log(error);
