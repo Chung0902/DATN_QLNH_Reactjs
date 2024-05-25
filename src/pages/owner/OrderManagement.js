@@ -2,24 +2,28 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import axiosClient from "../../libraries/axiosClient";
 import { NavLink } from "react-router-dom";
-import "././orders/OrderManagement.css"
+import "././orders/OrderManagement.css";
 
 const OrderManagement = () => {
   const [listorders, setListorders] = useState([]);
   const [status, setStatus] = useState("");
- 
+
   const [pageNumber, setPageNumber] = useState(0);
   const ordersPerPage = 10; // Số lượng đơn hàng mỗi trang
 
   const handleDelete = async (pId) => {
-    try {
-      const response = await axiosClient.delete(`questions/listorders1/${pId}`);
-      if (response?.success) {
-        toast.success(`orders is deleted`);
-        setListorders(listorders.filter((listorder) => listorder._id !== pId));
+    if (window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này không?")) {
+      try {
+        const response = await axiosClient.delete(`admin/orders/${pId}`);
+        if (response?.success) {
+          toast.success(`Đơn hàng đã được xóa`);
+          setListorders(
+            listorders.filter((listorder) => listorder.order._id !== pId)
+          );
+        }
+      } catch (error) {
+        toast.error("Đã xảy ra lỗi khi xóa đơn hàng");
       }
-    } catch (error) {
-      toast.error("Something went wrong");
     }
   };
 
@@ -50,7 +54,6 @@ const OrderManagement = () => {
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
-  
 
   return (
     <main className="app-content">
@@ -68,7 +71,7 @@ const OrderManagement = () => {
         <div className="col-md-12">
           <div className="tile">
             <div className="tile-body">
-            <div className="row element-button">
+              <div className="row element-button">
                 <div className="col-sm-2">
                   <NavLink
                     to="/main/ordermanagement/addorders"
@@ -98,9 +101,7 @@ const OrderManagement = () => {
                       <th>Ngày tạo</th>
                       <th>SL món ăn</th>
                       <th>Tổng tiền</th>
-                      <th>
-                        Trạng thái
-                      </th>
+                      <th>Trạng thái</th>
                       <th>Tính năng</th>
                     </tr>
                   </thead>
@@ -146,9 +147,7 @@ const OrderManagement = () => {
                                   className="btn btn-primary btn-sm trash"
                                   type="button"
                                   title="Xóa"
-                                  onClick={() => {
-                                    handleDelete(e.order._id);
-                                  }}
+                                  onClick={() => handleDelete(e._id)}
                                 >
                                   <i className="fas fa-trash-alt"></i>
                                 </button>

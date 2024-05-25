@@ -170,29 +170,31 @@ const EmployeeManager = () => {
       toast.error("Something went wrong");
     }
   };
-  //Delete category
+  //Delete
   const handleDelete = async (pId) => {
-    try {
-      const authToken = `Bearer ${auth.token}`; // Replace with your actual authentication token
+    if (window.confirm("Bạn có chắc chắn muốn xóa nhân viên này không?")) {
+      try {
+        const authToken = `Bearer ${auth.token}`;
+        const config = {
+          headers: {
+            Authorization: authToken,
+          },
+        };
 
-      const config = {
-        headers: {
-          Authorization: authToken,
-        },
-      };
-
-      const response = await axiosClient.delete(
-        `admin/employees/${pId}`,
-        config
-      );
-      if (response?.success) {
-        toast.success(`category is deleted`);
-        setEmployees(employees.filter((employee) => employee._id !== pId)); // Loại bỏ danh mục đã được xóa khỏi danh sách
+        const response = await axiosClient.delete(
+          `admin/employees/${pId}`,
+          config
+        );
+        if (response?.success) {
+          toast.success("Nhân viên đã được xóa");
+          setEmployees(employees.filter((employee) => employee._id !== pId));
+        }
+      } catch (error) {
+        toast.error("Đã xảy ra lỗi khi xóa nhân viên");
       }
-    } catch (error) {
-      toast.error("Something went wrong");
     }
   };
+
   // Hàm biến đổi định dạng ngày sinh
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -234,14 +236,14 @@ const EmployeeManager = () => {
                     </a>
                   </NavLink>
                 </div>
-                {/* <div className="col-sm-2">
+                <div className="col-sm-2">
                   <a
                     className="btn btn-delete btn-sm"
                     onClick={handleDeleteSelected}
                   >
                     <i className="fas fa-trash-alt"></i> Xóa tất cả{" "}
                   </a>
-                </div> */}
+                </div>
                 <div className="col-sm-7">
                   <form
                     className="d-flex "
@@ -271,13 +273,13 @@ const EmployeeManager = () => {
               >
                 <thead>
                   <tr>
-                    {/* <th width="10">
+                    <th width="10">
                       <input
                         type="checkbox"
                         id="all"
                         onChange={handleSelectAll}
                       />
-                    </th> */}
+                    </th>
                     <th>ID nhân viên</th>
                     <th width="150">Họ và tên</th>
                     <th width="300">Địa chỉ</th>
@@ -298,7 +300,7 @@ const EmployeeManager = () => {
                       .map((e) =>
                         e.role !== 1 ? (
                           <tr key={e._id}>
-                            {/* <td width="10">
+                            <td width="10">
                               <input
                                 type="checkbox"
                                 checked={checkedItems[e._id] || false}
@@ -306,7 +308,7 @@ const EmployeeManager = () => {
                                   handleItemCheck(event, e._id)
                                 }
                               />
-                            </td> */}
+                            </td>
                             <td>{e._id}</td>
                             <td>
                               {e.firstName} {e.lastName}
@@ -321,9 +323,7 @@ const EmployeeManager = () => {
                                 className="btn btn-primary btn-sm trash"
                                 type="button"
                                 title="Xóa"
-                                onClick={() => {
-                                  handleDelete(e._id);
-                                }}
+                                onClick={() => handleDelete(e._id)}
                               >
                                 <i className="fas fa-trash-alt"></i>
                               </button>

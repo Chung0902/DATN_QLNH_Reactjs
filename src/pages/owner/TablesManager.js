@@ -116,16 +116,19 @@ const TablesManager = () => {
 
   //Delete tables
   const handleDelete = async (pId) => {
-    try {
-      const response = await axiosClient.delete(`admin/tables/${pId}`);
-      if (response?.success) {
-        toast.success(`tables is deleted`);
-        setTables(tables.filter((table) => table._id !== pId));
+    if (window.confirm("Bạn có chắc chắn muốn xóa bàn này không?")) {
+      try {
+        const response = await axiosClient.delete(`admin/tables/${pId}`);
+        if (response?.success) {
+          toast.success(`Bàn đã được xóa`);
+          setTables(tables.filter((table) => table._id !== pId));
+        }
+      } catch (error) {
+        toast.error("Đã xảy ra lỗi khi xóa bàn");
       }
-    } catch (error) {
-      toast.error("Something went wrong");
     }
   };
+
   const getAllTables = async () => {
     try {
       const response = await axiosClient.get("admin/tables");
@@ -137,7 +140,7 @@ const TablesManager = () => {
 
   useEffect(() => {
     getAllTables();
-  }, []);
+  }, [tables]);
 
   return (
     <main className="app-content">
@@ -279,9 +282,7 @@ const TablesManager = () => {
                               className="btn btn-primary btn-sm trash"
                               type="button"
                               title="Xóa"
-                              onClick={() => {
-                                handleDelete(p._id);
-                              }}
+                              onClick={() => handleDelete(p._id)}
                             >
                               <i className="fas fa-trash-alt"></i>
                             </button>
