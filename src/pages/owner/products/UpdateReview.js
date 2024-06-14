@@ -7,6 +7,8 @@ const UpdateReview = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [reviews, setReviews] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); 
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -32,21 +34,38 @@ const UpdateReview = () => {
   }, [reviews]);
 
   const handleUpdate = (reviewId) => {
-    // Thêm logic cập nhật tại đây
     console.log("Update review:", reviewId);
+  
   };
 
   const handleDelete = async (reviewId) => {
     try {
-      // Thêm logic xóa tại đây
       console.log("Delete review:", reviewId);
-      // Cập nhật lại danh sách đánh giá sau khi xóa
+  
       setReviews(reviews.filter(review => review._id !== reviewId));
     } catch (error) {
       console.error("Error deleting review:", error);
     }
   };
 
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentReviews = reviews.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  const formatDate = (createdAt) => {
+    const dateObj = new Date(createdAt);
+    const hours = dateObj.getHours();
+    const minutes = dateObj.getMinutes();
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+
+    const formattedDate = `${hours}:${minutes < 10 ? '0' + minutes : minutes} ${day}/${month}/${year}`;
+    return formattedDate;
+  };
   return (
     <main className="app-content">
       <div className="app-title">
@@ -68,17 +87,19 @@ const UpdateReview = () => {
           <div className="tile">
             <div className="tile-body">
               <ul className="review-list">
-                {Array.isArray(reviews) && reviews.length > 0 ? (
-                  reviews.map((review, index) => (
+                {currentReviews.length > 0 ? (
+                  currentReviews.map((review, index) => (
                     <li key={index} className="review-item">
                       <div className="review-avatar">
                         <img src={`https://datn-qlnh-nodejs.onrender.com/${review.customerAvatar}`} alt="" />
                       </div>
                       <div className="review-details">
                         <p className="review-name">{review.customerName}</p>
+                        <p className="review-comment">{formatDate(review.createdAt)}</p>
                         <p className="review-rating">
                           {"★".repeat(review.rating)}
-                          {"☆".repeat(5 - review.rating)}</p>
+                          {"☆".repeat(5 - review.rating)}
+                        </p>
                         <p className="review-comment">{review.comment}</p>
                         <div className="review-actions">
                           <button onClick={() => handleUpdate(review._id)} className="btn-update">Cập nhật</button>
@@ -91,6 +112,20 @@ const UpdateReview = () => {
                   <li>Món ăn này chưa có đánh giá</li>
                 )}
               </ul>
+            
+              {reviews.length > itemsPerPage && (
+                <nav>
+                  <ul className="pagination">
+                    {[...Array(Math.ceil(reviews.length / itemsPerPage)).keys()].map(number => (
+                      <li key={number + 1} className="page-item">
+                        <button onClick={() => paginate(number + 1)} className="page-link">
+                          {number + 1}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
             </div>
           </div>
         </div>
