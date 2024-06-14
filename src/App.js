@@ -22,6 +22,9 @@ import TablesManager from './pages/owner/TablesManager';
 import AddTable from "./pages/owner/table/AddTable";
 import OrderDetails from './pages/owner/orders/OrderDetails';
 import AddOrders from "./pages/owner/orders/AddOrders";
+import UpdateReview from "./pages/owner/products/UpdateReview";
+
+
 
 
 function App() {
@@ -51,6 +54,9 @@ function App() {
 
           <Route path="/main/tablesmanager" element={<TablesManager/>} />
           <Route path="/main/tablesmanager/addtables" element={<AddTable/>} />
+
+          <Route path="/main/productsmanager/reviews/:id" element={<UpdateReview/>} />
+
 
           
 

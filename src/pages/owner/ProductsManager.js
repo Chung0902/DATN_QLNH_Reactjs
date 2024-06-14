@@ -161,6 +161,7 @@ const ProductsManager = () => {
     getAllProducts();
   }, []);
 
+
   return (
     <main className="app-content">
       <div className="app-title">
@@ -327,6 +328,17 @@ const ProductsManager = () => {
                               setCategoryId={setCategoryId}
                               setSupplierId={setSupplierId}
                             />
+
+                            <NavLink
+                              to={`/main/productsmanager/reviews/${p._id}`}
+                            >
+                              <button
+                                className="btn btn-primary btn-sm edit"
+                                title="Xem đánh giá món ăn"
+                              >
+                                <i className="fas fa-wallet"></i>
+                              </button>
+                            </NavLink>
                           </td>
                         </tr>
                       ))}
