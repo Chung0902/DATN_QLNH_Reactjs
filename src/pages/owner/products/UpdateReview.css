@@ -27,6 +27,7 @@
     height: 50px;
     object-fit: cover;
     margin-right: 20px;
+    margin-top: -90px;
   }
   
   .review-details {
@@ -41,6 +42,7 @@
   .review-rating {
     color: #ffaa00;
     margin: 0 0 5px;
+    margin-top: -10px;
   }
   
   .review-comment {
