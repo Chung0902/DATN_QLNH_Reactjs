@@ -293,6 +293,29 @@ const OrderDetails = () => {
                               onChange={(e) => setCustomerId(e.target.value)}
                             />
                           </div>
+
+                          <div>
+                            <label>Ngày đến</label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              required
+                              value={formatDate(e.order.reservationDate)}
+                              onChange={(e) => setTableId(e.target.value)}
+                            />
+                          </div>
+
+                          <div>
+                            <label>Giờ đến</label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              required
+                              value={e.order.reservationTime}
+                              onChange={(e) => setTableId(e.target.value)}
+                            />
+                          </div>
+
                           <div>
                             <span>
                               Ngày đặt: {formatDate(e.order.createdDate)}

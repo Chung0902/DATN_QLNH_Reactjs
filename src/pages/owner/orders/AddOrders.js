@@ -22,6 +22,17 @@ const AddOrders = () => {
   const [employeeId, setEmployeeId] = useState();
   const [price, setPrice] = useState();
   const [quantity, setQuantity] = useState();
+  const [reservationDate, setReservationDate] = useState("");
+  const [reservationTime, setReservationTime] = useState("");
+
+  useEffect(() => {
+    const currentDateTime = new Date();
+    const formattedDate = currentDateTime.toISOString().split("T")[0];
+    const formattedTime = currentDateTime.toTimeString().split(" ")[0].slice(0, 5);
+
+    setReservationDate(formattedDate);
+    setReservationTime(formattedTime);
+  }, []);
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
@@ -234,6 +245,8 @@ const AddOrders = () => {
         customerId,
         employeeId,
         discount,
+        reservationDate,
+        reservationTime,
         orderDetails: newRows.map((row) => ({
           productId: row.productId,
           quantity: row.quantity,
@@ -330,6 +343,28 @@ const AddOrders = () => {
                             </option>
                           ))}
                       </select>
+                    </div>
+
+                    <div>
+                      <label>Ngày đặt trước</label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        required
+                        value={reservationDate}
+                        min={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setReservationDate(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label>Giờ đặt trước</label>
+                      <input
+                        type="time"
+                        className="form-control"
+                        required
+                        value={reservationTime}
+                        onChange={(e) => setReservationTime(e.target.value)}
+                      />
                     </div>
 
                     <div>

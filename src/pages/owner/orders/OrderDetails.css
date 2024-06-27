@@ -140,5 +140,12 @@
     font-weight: bold;
   }
 
+  .invoice-header div{
+    margin-left: 10px;
+  }
+  span{
+    margin-left: 10px;
+  }
+
   
   
